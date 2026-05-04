@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>IPPAD — Home | Imams & Pastors Interfaith Forum for Peace and Development</title>
+<link rel="icon" type="image/jpeg" href="logo.jpeg">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="style.css">
+<script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="mainNav">
+  <a class="nav-brand" href="index.html">
+    <div class="nav-logo">
+      <img src="logo.jpeg" alt="IPPAD Logo">
+    </div>
+    <div class="nav-name">
+      <strong>IPPAD</strong>
+      <span>Imams & Pastors Interfaith Forum</span>
+    </div>
+  </a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="index.html" class="active">Home</a></li>
+    <li><a href="about.html">About Us</a></li>
+    <li><a href="programs.html">Programs</a></li>
+    <li><a href="media.html">Media & Resources</a></li>
+    <li><a href="contact.html">Contact</a></li>
+    <li><a href="contact.html#donate" class="nav-cta">Donate</a></li>
+  </ul>
+  <button class="hamburger" onclick="toggleMenu()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu">
+  <div class="mobile-logo-wrap" style="padding: 10px 0 20px; border-bottom: 1px solid var(--border); margin-bottom: 10px;">
+    <img src="logo.jpeg" alt="IPPAD Logo" style="width: 60px; height: 60px; border-radius: 50%;">
+  </div>
+  <a href="index.html" class="active">Home</a>
+  <a href="about.html">About Us</a>
+  <a href="programs.html">Programs</a>
+  <a href="media.html">Media & Resources</a>
+  <a href="contact.html">Contact Us</a>
+  <a href="contact.html#donate" style="color:var(--green);font-weight:700">Donate ↗</a>
+</div>
+
+<!-- ====== HOME ====== -->
+<div class="page" id="page-home">
+
+  <div class="hero">
+    <div class="hero-left">
+      <div class="hero-badge">Different Faiths, One Humanity</div>
+      <h1>Imams &amp; Pastors<br/><em>Interfaith Forum</em><br/>for Peace &amp; Development</h1>
+      <p class="hero-motto">IPPAD — Becoming Better Together</p>
+      <p class="hero-desc">A faith-based, non-partisan platform uniting Muslim and Christian leaders to build peaceful, healthy, and resilient communities across Nigeria — through structured dialogue, trauma healing, and measurable community action.</p>
+      <div class="hero-btns">
+        <a href="programs.html" class="btn-gold">Our Programs</a>
+        <a href="about.html" class="btn-white-outline">Our Story</a>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat"><strong>2+</strong><span>Decades of Experience</span></div>
+        <div class="hero-stat"><strong>7</strong><span>Program Pillars</span></div>
+        <div class="hero-stat"><strong>15+</strong><span>Objectives in Action</span></div>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="hero-logo-wrap" style="position:relative; z-index:1;">
+        <img src="logo.jpeg" alt="IPPAD Logo" style="width:280px; height:280px; border-radius:50%; box-shadow:0 20px 50px rgba(0,0,0,0.2); border:8px solid rgba(255,255,255,0.1);">
+      </div>
+      <div class="founder-card">
+        <p class="quote">"Faith must serve as a bridge for unity, not a barrier to coexistence."</p>
+        <p class="name">Bishop Dr. Sam Moses Tukura, JP</p>
+        <p class="title">Founder & Visioner, IPPAD</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- IMPACT -->
+  <div class="impact-strip">
+    <div class="impact-item"><strong>9</strong><span>Program Areas</span></div>
+    <div class="impact-item"><strong>15+</strong><span>Strategic Objectives</span></div>
+    <div class="impact-item"><strong>Zaria &amp; Jos</strong><span>Founded in Action</span></div>
+    <div class="impact-item"><strong>National</strong><span>Reach Across Nigeria</span></div>
+  </div>
+
+  <!-- WHAT WE DO -->
+  <div class="section">
+    <div class="section-label">What We Stand For</div>
+    <h2 class="section-title">From <em>Dialogue</em> to Impact</h2>
+    <p class="section-sub">IPPAD goes beyond talk — translating shared faith values into practical, measurable interventions across Nigeria's communities.</p>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-top"></div>
+        <div class="card-body">
+          <div class="card-icon icon-g"><i data-lucide="dove"></i></div>
+          <h3>Conflict Prevention &amp; Peace</h3>
+          <p>Joint interfaith peace committees, rapid-response mediation teams, and early warning systems to prevent religious and communal conflict before it escalates.</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-top"></div>
+        <div class="card-body">
+          <div class="card-icon icon-b"><i data-lucide="heart-pulse"></i></div>
+          <h3>Trauma Healing &amp; Cohesion</h3>
+          <p>Trauma healing workshops, psychosocial support, and counselling for conflict-affected communities — promoting forgiveness, reconciliation, and emotional healing.</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-top"></div>
+        <div class="card-body">
+          <div class="card-icon icon-gold"><i data-lucide="leaf"></i></div>
+          <h3>Community Development</h3>
+          <p>Pooling resources to provide basic amenities, humanitarian aid, health advocacy, education, and economic empowerment for vulnerable populations.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUOTE -->
+  <div class="quote-section">
+    <blockquote>"While religion has the power to unite, it is often left unstructured. Yet at their core, Islam and Christianity both uphold shared values — human dignity, justice, compassion, and peace."</blockquote>
+    <cite>— Bishop Dr. Sam Moses Tukura, JP &nbsp;·&nbsp; Founder &amp; Visioner, IPPAD</cite>
+  </div>
+
+  <!-- PROGRAMS PREVIEW -->
+  <div class="section">
+    <div class="section-label">Our Programs</div>
+    <h2 class="section-title">Built on <em>Shared Values</em></h2>
+    <p class="section-sub">Seven pillars of action driving real change in communities across Nigeria.</p>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-top"></div>
+        <div class="card-body">
+          <div class="card-icon icon-g"><i data-lucide="scale"></i></div>
+          <h3>Advocacy, Justice &amp; Rights</h3>
+          <p>Legal awareness, inclusive governance advocacy, and countering hate speech through faith-based messaging and moral leadership.</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-top"></div>
+        <div class="card-body">
+          <div class="card-icon icon-b"><i data-lucide="users"></i></div>
+          <h3>Youth &amp; Women Empowerment</h3>
+          <p>Interfaith youth peace clubs, leadership camps, and active participation of women in peacebuilding — preventing radicalization through engagement.</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-top"></div>
+        <div class="card-body">
+          <div class="card-icon icon-gold"><i data-lucide="graduation-cap"></i></div>
+          <h3>Education &amp; Character</h3>
+          <p>Scholarships for disadvantaged children, support for IDPs and out-of-school youth, and school peace clubs for interfaith engagement.</p>
+        </div>
+      </div>
+    </div>
+    <br/><br/>
+    <a href="programs.html" class="btn-green">View All Programs →</a>
+  </div>
+
+  <!-- PARTNERS -->
+  <div class="partners-strip">
+    <p class="partners-label">Working alongside</p>
+    <div class="partners-logos">
+      <div class="partner-logo">CAN</div>
+      <div class="partner-logo">JNI</div>
+      <div class="partner-logo">NSCIA</div>
+      <div class="partner-logo">UNICEF</div>
+      <div class="partner-logo">UN Nigeria</div>
+      <div class="partner-logo">EU Nigeria</div>
+      <div class="partner-logo">USAID</div>
+    </div>
+  </div>
+
+  <!-- NEWSLETTER -->
+  <div class="newsletter-bar">
+    <h3>Stay Informed</h3>
+    <p>Receive updates on our programs, events, and publications in your inbox.</p>
+    <div class="newsletter-form">
+      <input type="email" placeholder="Your email address"/>
+      <button>Subscribe</button>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <strong>Imams &amp; Pastors Interfaith Forum<br/>for Peace and Development (IPPAD)</strong>
+      <p>Different Faiths, One Humanity — Becoming Better Together. A faith-based, non-partisan platform uniting Muslim and Christian leaders for peace, development, and social transformation across Nigeria.</p>
+      <div class="footer-social">
+        <div class="social-btn" title="Facebook">f</div>
+        <div class="social-btn" title="Twitter">𝕏</div>
+        <div class="social-btn" title="Instagram">◎</div>
+        <div class="social-btn" title="YouTube">▶</div>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Organisation</h4>
+      <ul>
+        <li><a href="about.html">About IPPAD</a></li>
+        <li><a href="about.html#founder">Our Founder</a></li>
+        <li><a href="about.html#governance">Governance</a></li>
+        <li><a href="programs.html">Our Programs</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Engage</h4>
+      <ul>
+        <li><a href="media.html#events">Events</a></li>
+        <li><a href="media.html#gallery">Gallery</a></li>
+        <li><a href="contact.html#involve">Get Involved</a></li>
+        <li><a href="contact.html#donate">Donate</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Contact</h4>
+      <ul>
+        <li><a href="contact.html">Contact Us</a></li>
+        <li><a>+234 705 252 9263</a></li>
+        <li><a>+234 803 718 1983</a></li>
+        <li><a>imamandpastorsforum@gmail.com</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 IPPAD — Imams &amp; Pastors Interfaith Forum for Peace and Development. All rights reserved.</span>
+    <span style="color:rgba(255,255,255,.4);">interfaithlink.org</span>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

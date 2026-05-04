@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Media & Resources — IPPAD | Imams & Pastors Interfaith Forum</title>
+<link rel="icon" type="image/jpeg" href="logo.jpeg">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="style.css">
+<script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="mainNav">
+  <a class="nav-brand" href="index.html">
+    <div class="nav-logo">
+      <img src="logo.jpeg" alt="IPPAD Logo">
+    </div>
+    <div class="nav-name">
+      <strong>IPPAD</strong>
+      <span>Imams & Pastors Interfaith Forum</span>
+    </div>
+  </a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="about.html">About Us</a></li>
+    <li><a href="programs.html">Programs</a></li>
+    <li><a href="media.html" class="active">Media & Resources</a></li>
+    <li><a href="contact.html">Contact</a></li>
+    <li><a href="contact.html#donate" class="nav-cta">Donate</a></li>
+  </ul>
+  <button class="hamburger" onclick="toggleMenu()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu">
+  <div class="mobile-logo-wrap" style="padding: 10px 0 20px; border-bottom: 1px solid var(--border); margin-bottom: 10px;">
+    <img src="logo.jpeg" alt="IPPAD Logo" style="width: 60px; height: 60px; border-radius: 50%;">
+  </div>
+  <a href="index.html">Home</a>
+  <a href="about.html">About Us</a>
+  <a href="programs.html">Programs</a>
+  <a href="media.html" class="active">Media & Resources</a>
+  <a href="contact.html">Contact Us</a>
+  <a href="contact.html#donate" style="color:var(--green);font-weight:700">Donate ↗</a>
+</div>
+
+<!-- ====== MEDIA & RESOURCES ====== -->
+<div class="page" id="page-media">
+  <div class="page-hero">
+    <div class="page-hero-tag">Media &amp; Resources</div>
+    <h1>Events, Gallery<br/>&amp; <em>Insights</em></h1>
+    <p>A central hub for our community engagements, visual stories, and research publications.</p>
+  </div>
+
+  <!-- EVENTS -->
+  <div class="section" id="events">
+    <div class="section-label">Events</div>
+    <h2 class="section-title">Upcoming &amp; Past <em>Events</em></h2>
+    <div class="basic-placeholder">
+      <div class="icon"><i data-lucide="calendar"></i></div>
+      <h3>Events Coming Soon</h3>
+      <p>Our upcoming events calendar is being updated. Check back shortly or contact us to learn about our next program.</p>
+      <br/>
+      <a href="contact.html" class="btn-green">Contact Us for Updates</a>
+    </div>
+  </div>
+
+  <!-- GALLERY -->
+  <div class="section" id="gallery" style="background:var(--grey);border-top:1px solid var(--border);">
+    <div class="section-label">Photo Gallery</div>
+    <h2 class="section-title">Moments of <em>Unity</em></h2>
+    <p class="section-sub">Photos from our programs and activities will be uploaded here. Send your photos to <strong>imamandpastorsforum@gmail.com</strong></p>
+    <div class="gallery-grid">
+      <div class="gallery-item"><div class="g-placeholder g1"><i data-lucide="home" style="width:32px;height:32px;margin-bottom:8px;"></i><span>Interfaith Dialogue</span></div></div>
+      <div class="gallery-item"><div class="g-placeholder g2"><i data-lucide="handshake" style="width:32px;height:32px;margin-bottom:8px;"></i><span>Community Meeting</span></div></div>
+      <div class="gallery-item"><div class="g-placeholder g3"><i data-lucide="book-open" style="width:32px;height:32px;margin-bottom:8px;"></i><span>Training Workshop</span></div></div>
+      <div class="gallery-item"><div class="g-placeholder g4"><i data-lucide="globe" style="width:32px;height:32px;margin-bottom:8px;"></i><span>Program Launch</span></div></div>
+      <div class="gallery-item"><div class="g-placeholder g5"><i data-lucide="users" style="width:32px;height:32px;margin-bottom:8px;"></i><span>Youth Program</span></div></div>
+      <div class="gallery-item"><div class="g-placeholder g6"><i data-lucide="heart" style="width:32px;height:32px;margin-bottom:8px;"></i><span>Humanitarian Relief</span></div></div>
+    </div>
+  </div>
+
+  <!-- PUBLICATIONS -->
+  <div class="section" id="publications">
+    <div class="section-label">Publications</div>
+    <h2 class="section-title">Reports &amp; <em>Communiqués</em></h2>
+    <div class="basic-placeholder">
+      <div class="icon"><i data-lucide="file-text"></i></div>
+      <h3>Publications Coming Soon</h3>
+      <p>Our reports, communiqués, and research publications will be available here. Contact us to request specific documents.</p>
+      <br/>
+      <a href="contact.html" class="btn-green">Request a Publication</a>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <strong>Imams &amp; Pastors Interfaith Forum<br/>for Peace and Development (IPPAD)</strong>
+      <p>Different Faiths, One Humanity — Becoming Better Together. A faith-based, non-partisan platform uniting Muslim and Christian leaders for peace, development, and social transformation across Nigeria.</p>
+      <div class="footer-social">
+        <div class="social-btn" title="Facebook">f</div>
+        <div class="social-btn" title="Twitter">𝕏</div>
+        <div class="social-btn" title="Instagram">◎</div>
+        <div class="social-btn" title="YouTube">▶</div>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Organisation</h4>
+      <ul>
+        <li><a href="about.html">About IPPAD</a></li>
+        <li><a href="about.html#founder">Our Founder</a></li>
+        <li><a href="about.html#governance">Governance</a></li>
+        <li><a href="programs.html">Our Programs</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Engage</h4>
+      <ul>
+        <li><a href="media.html#events">Events</a></li>
+        <li><a href="media.html#gallery">Gallery</a></li>
+        <li><a href="contact.html#involve">Get Involved</a></li>
+        <li><a href="contact.html#donate">Donate</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Contact</h4>
+      <ul>
+        <li><a href="contact.html">Contact Us</a></li>
+        <li><a>+234 705 252 9263</a></li>
+        <li><a>+234 803 718 1983</a></li>
+        <li><a>imamandpastorsforum@gmail.com</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 IPPAD — Imams &amp; Pastors Interfaith Forum for Peace and Development. All rights reserved.</span>
+    <span style="color:rgba(255,255,255,.4);">interfaithlink.org</span>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
