@@ -17,7 +17,7 @@ document.querySelectorAll('.mobile-menu a').forEach(link => {
 });
 
 // Reveal on scroll
-const revealElements = document.querySelectorAll('.section, .card, .prog-card, .obj-item, .impact-item, .about-photo, .founder-card, .footer-col');
+const revealElements = document.querySelectorAll('.reveal, .section, .card, .prog-card, .obj-item, .impact-item, .about-photo, .founder-card, .footer-col');
 revealElements.forEach(el => el.classList.add('reveal'));
 
 const revealObserver = new IntersectionObserver((entries) => {
