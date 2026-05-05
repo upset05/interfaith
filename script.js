@@ -1,8 +1,8 @@
-function toggleMenu(){
+function toggleMenu() {
   document.getElementById('mobileMenu').classList.toggle('open');
 }
 
-window.addEventListener('scroll',()=>{
+window.addEventListener('scroll', () => {
   const nav = document.getElementById('mainNav');
   if (nav) {
     nav.classList.toggle('scrolled', window.scrollY > 10);
@@ -92,7 +92,6 @@ const galleryImages = [
   "WhatsApp Image 2026-05-04 at 1.57.07 PM (2).jpeg",
   "WhatsApp Image 2026-05-04 at 1.57.07 PM.jpeg",
   "WhatsApp Image 2026-05-04 at 1.57.08 PM.jpeg",
-  "WhatsApp Image 2026-05-04 at 1.57.09 PM (1).jpeg",
   "WhatsApp Image 2026-05-04 at 1.57.09 PM.jpeg",
   "WhatsApp Image 2026-05-04 at 1.57.10 PM.jpeg",
   "WhatsApp Image 2026-05-04 at 1.57.12 PM.jpeg",
@@ -139,17 +138,17 @@ document.addEventListener('DOMContentLoaded', () => {
   if (dynamicGallery) {
     // Clear existing placeholders
     dynamicGallery.innerHTML = '';
-    
+
     // Add all images to the grid
     galleryImages.forEach(src => {
       const imgWrap = document.createElement('div');
       imgWrap.className = 'dynamic-gallery-item';
-      
+
       const img = document.createElement('img');
       img.src = src;
       img.alt = "IPPAD Event Photo";
       img.loading = "lazy";
-      
+
       imgWrap.appendChild(img);
       dynamicGallery.appendChild(imgWrap);
     });
