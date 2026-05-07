@@ -204,22 +204,55 @@ const galleryImages = [
 // Populate Gallery if container exists
 document.addEventListener('DOMContentLoaded', () => {
   const dynamicGallery = document.getElementById('dynamicGallery');
-  if (dynamicGallery) {
-    // Clear existing placeholders
+  const btnLoadMore = document.getElementById('btnLoadMore');
+  const paginationContainer = document.getElementById('galleryPagination');
+  
+  if (dynamicGallery && btnLoadMore) {
+    const BATCH_SIZE = 15;
+    let currentIndex = 0;
+
+    function renderBatch() {
+      const nextBatch = galleryImages.slice(currentIndex, currentIndex + BATCH_SIZE);
+      
+      nextBatch.forEach(src => {
+        const imgWrap = document.createElement('div');
+        imgWrap.className = 'dynamic-gallery-item';
+
+        const img = document.createElement('img');
+        img.src = src;
+        img.alt = "IPPAD Event Photo";
+        img.loading = "lazy";
+
+        imgWrap.appendChild(img);
+        dynamicGallery.appendChild(imgWrap);
+      });
+
+      currentIndex += BATCH_SIZE;
+
+      // Hide button if no more images
+      if (currentIndex >= galleryImages.length) {
+        paginationContainer.style.display = 'none';
+      }
+    }
+
+    // Initial Load
     dynamicGallery.innerHTML = '';
+    renderBatch();
 
-    // Add all images to the grid
-    galleryImages.forEach(src => {
-      const imgWrap = document.createElement('div');
-      imgWrap.className = 'dynamic-gallery-item';
-
-      const img = document.createElement('img');
-      img.src = src;
-      img.alt = "IPPAD Event Photo";
-      img.loading = "lazy";
-
-      imgWrap.appendChild(img);
-      dynamicGallery.appendChild(imgWrap);
+    // Load More Event
+    btnLoadMore.addEventListener('click', () => {
+      btnLoadMore.innerText = "Loading...";
+      btnLoadMore.disabled = true;
+      
+      // Simulate a small delay for better UX
+      setTimeout(() => {
+        renderBatch();
+        btnLoadMore.innerText = "Load More Photos";
+        btnLoadMore.disabled = false;
+        
+        // Re-initialize Lucide if needed (though not used in items currently)
+        if (window.lucide) lucide.createIcons();
+      }, 400);
     });
   }
 });

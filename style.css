@@ -344,6 +344,26 @@ nav.scrolled{box-shadow:0 2px 24px rgba(0,0,0,.07);}
   .dynamic-gallery{ column-count: 1; }
 }
 
+#galleryPagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 40px;
+}
+
+#btnLoadMore {
+  min-width: 200px;
+}
+
+.dynamic-gallery-item {
+  animation: galleryFadeIn 0.6s ease-out forwards;
+}
+
+@keyframes galleryFadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
 /* CONTACT */
 .contact-grid{display:grid;grid-template-columns:1fr 1.3fr;gap:56px;}
 .cinfo-card{background:white;border:1px solid var(--border);border-radius:10px;padding:24px;margin-bottom:14px;display:flex;gap:16px;align-items:flex-start;transition:box-shadow .3s;}
