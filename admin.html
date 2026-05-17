@@ -1017,7 +1017,7 @@ header {
 
 <script>
 // --- SAFE STORAGE FALLBACK ---
-const safeLocalStorage = {
+const sysStorage = {
   _data: {},
   getItem: function(key) {
     try { return window.localStorage.getItem(key); } catch (e) { return this._data[key] || null; }
@@ -1029,7 +1029,7 @@ const safeLocalStorage = {
     try { window.localStorage.removeItem(key); } catch (e) { delete this._data[key]; }
   }
 };
-const safeSessionStorage = {
+const sysSessionStorage = {
   _data: {},
   getItem: function(key) {
     try { return window.sessionStorage.getItem(key); } catch (e) { return this._data[key] || null; }
@@ -1041,8 +1041,6 @@ const safeSessionStorage = {
     try { window.sessionStorage.removeItem(key); } catch (e) { delete this._data[key]; }
   }
 };
-const localStorage = safeLocalStorage;
-const sessionStorage = safeSessionStorage;
 
 // Array of local pictures extracted from project
 const projectImages = [
@@ -1387,12 +1385,12 @@ function updateFileLabel(inputId, filename) {
 // --- AUTHENTICATION MODULE ---
 window.onload = function() {
   try {
-    if (sessionStorage.getItem('ippad_admin_logged_in') === 'true') {
+    if (sysSessionStorage.getItem('ippad_admin_logged_in') === 'true') {
       const overlay = document.getElementById('loginOverlay');
       if (overlay) overlay.style.display = 'none';
     }
   } catch(e) {
-    console.warn("sessionStorage not available", e);
+    console.warn("sysSessionStorage not available", e);
   }
   
   // Render dropdown pickers and content lists
@@ -1413,9 +1411,9 @@ function handleLogin(event) {
   
   if (pass === 'ippad2026') {
     try {
-      sessionStorage.setItem('ippad_admin_logged_in', 'true');
+      sysSessionStorage.setItem('ippad_admin_logged_in', 'true');
     } catch(e) {
-      console.warn("sessionStorage not available", e);
+      console.warn("sysSessionStorage not available", e);
     }
     const overlay = document.getElementById('loginOverlay');
     if (overlay) overlay.style.display = 'none';
@@ -1450,9 +1448,9 @@ function handleLogin(event) {
 
 function handleLogout() {
   try {
-    sessionStorage.removeItem('ippad_admin_logged_in');
+    sysSessionStorage.removeItem('ippad_admin_logged_in');
   } catch(e) {
-    console.warn("sessionStorage not available", e);
+    console.warn("sysSessionStorage not available", e);
   }
   const overlay = document.getElementById('loginOverlay');
   if (overlay) overlay.style.display = 'flex';
@@ -1542,12 +1540,12 @@ function loadHeroForm() {
     });
     return;
   }
-  document.getElementById('hero_badge').value = localStorage.getItem('ippad_hero_badge') || '';
-  document.getElementById('hero_title').value = localStorage.getItem('ippad_hero_title') || '';
-  document.getElementById('hero_motto').value = localStorage.getItem('ippad_hero_motto') || '';
-  document.getElementById('hero_desc').value = localStorage.getItem('ippad_hero_desc') || '';
+  document.getElementById('hero_badge').value = sysStorage.getItem('ippad_hero_badge') || '';
+  document.getElementById('hero_title').value = sysStorage.getItem('ippad_hero_title') || '';
+  document.getElementById('hero_motto').value = sysStorage.getItem('ippad_hero_motto') || '';
+  document.getElementById('hero_desc').value = sysStorage.getItem('ippad_hero_desc') || '';
   
-  const heroPhoto = localStorage.getItem('ippad_hero_photo') || '';
+  const heroPhoto = sysStorage.getItem('ippad_hero_photo') || '';
   document.getElementById('hero_photo_url').value = heroPhoto;
   highlightPicker('heroPickerGrid', heroPhoto);
 }
@@ -1581,11 +1579,11 @@ function saveHeroContent(event) {
     return;
   }
 
-  localStorage.setItem('ippad_hero_badge', badge);
-  localStorage.setItem('ippad_hero_title', title);
-  localStorage.setItem('ippad_hero_motto', motto);
-  localStorage.setItem('ippad_hero_desc', desc);
-  localStorage.setItem('ippad_hero_photo', photo);
+  sysStorage.setItem('ippad_hero_badge', badge);
+  sysStorage.setItem('ippad_hero_title', title);
+  sysStorage.setItem('ippad_hero_motto', motto);
+  sysStorage.setItem('ippad_hero_desc', desc);
+  sysStorage.setItem('ippad_hero_photo', photo);
   showToast("Homepage Hero Content updated successfully!");
 }
 
@@ -1599,7 +1597,7 @@ function renderPosts() {
         if (error) throw error;
         return data || [];
       })
-    : Promise.resolve(JSON.parse(localStorage.getItem('ippad_posts') || '[]'));
+    : Promise.resolve(JSON.parse(sysStorage.getItem('ippad_posts') || '[]'));
 
   fetchAction.then(posts => {
     if (posts.length === 0) {
@@ -1646,9 +1644,9 @@ function handleAddPost(event) {
   const addAction = supabase
     ? supabase.from('posts').insert([newPost])
     : Promise.resolve().then(() => {
-        const posts = JSON.parse(localStorage.getItem('ippad_posts') || '[]');
+        const posts = JSON.parse(sysStorage.getItem('ippad_posts') || '[]');
         posts.unshift(newPost);
-        localStorage.setItem('ippad_posts', JSON.stringify(posts));
+        sysStorage.setItem('ippad_posts', JSON.stringify(posts));
       });
 
   addAction.then(({ error } = {}) => {
@@ -1670,9 +1668,9 @@ function deletePost(id) {
   const deleteAction = supabase
     ? supabase.from('posts').delete().eq('id', id)
     : Promise.resolve().then(() => {
-        let posts = JSON.parse(localStorage.getItem('ippad_posts') || '[]');
+        let posts = JSON.parse(sysStorage.getItem('ippad_posts') || '[]');
         posts = posts.filter(p => p.id !== id);
-        localStorage.setItem('ippad_posts', JSON.stringify(posts));
+        sysStorage.setItem('ippad_posts', JSON.stringify(posts));
       });
 
   deleteAction.then(({ error } = {}) => {
@@ -1695,7 +1693,7 @@ function renderEvents() {
         if (error) throw error;
         return data || [];
       })
-    : Promise.resolve(JSON.parse(localStorage.getItem('ippad_event_heroes') || '[]'));
+    : Promise.resolve(JSON.parse(sysStorage.getItem('ippad_event_heroes') || '[]'));
 
   fetchAction.then(events => {
     if (events.length === 0) {
@@ -1742,9 +1740,9 @@ function handleAddEvent(event) {
   const addAction = supabase
     ? supabase.from('event_heroes').insert([newEH])
     : Promise.resolve().then(() => {
-        const events = JSON.parse(localStorage.getItem('ippad_event_heroes') || '[]');
+        const events = JSON.parse(sysStorage.getItem('ippad_event_heroes') || '[]');
         events.push(newEH);
-        localStorage.setItem('ippad_event_heroes', JSON.stringify(events));
+        sysStorage.setItem('ippad_event_heroes', JSON.stringify(events));
       });
 
   addAction.then(({ error } = {}) => {
@@ -1766,9 +1764,9 @@ function deleteEvent(id) {
   const deleteAction = supabase
     ? supabase.from('event_heroes').delete().eq('id', id)
     : Promise.resolve().then(() => {
-        let events = JSON.parse(localStorage.getItem('ippad_event_heroes') || '[]');
+        let events = JSON.parse(sysStorage.getItem('ippad_event_heroes') || '[]');
         events = events.filter(e => e.id !== id);
-        localStorage.setItem('ippad_event_heroes', JSON.stringify(events));
+        sysStorage.setItem('ippad_event_heroes', JSON.stringify(events));
       });
 
   deleteAction.then(({ error } = {}) => {
@@ -1791,7 +1789,7 @@ function renderGallery() {
         if (error) throw error;
         return (data || []).map(item => ({ id: item.id, image_url: item.image_url }));
       })
-    : Promise.resolve(JSON.parse(localStorage.getItem('ippad_gallery') || '[]').map((src, idx) => ({ id: idx, image_url: src })));
+    : Promise.resolve(JSON.parse(sysStorage.getItem('ippad_gallery') || '[]').map((src, idx) => ({ id: idx, image_url: src })));
 
   fetchAction.then(photos => {
     if (photos.length === 0) {
@@ -1841,9 +1839,9 @@ function handleAddGallery(event) {
   const addAction = supabase
     ? supabase.from('gallery').insert([newPhoto])
     : Promise.resolve().then(() => {
-        const photos = JSON.parse(localStorage.getItem('ippad_gallery') || '[]');
+        const photos = JSON.parse(sysStorage.getItem('ippad_gallery') || '[]');
         photos.unshift(url);
-        localStorage.setItem('ippad_gallery', JSON.stringify(photos));
+        sysStorage.setItem('ippad_gallery', JSON.stringify(photos));
       });
 
   addAction.then(({ error } = {}) => {
@@ -1865,10 +1863,10 @@ function deleteGalleryPhoto(id) {
   const deleteAction = supabase
     ? supabase.from('gallery').delete().eq('id', id)
     : Promise.resolve().then(() => {
-        const photos = JSON.parse(localStorage.getItem('ippad_gallery') || '[]');
+        const photos = JSON.parse(sysStorage.getItem('ippad_gallery') || '[]');
         const index = parseInt(id);
         photos.splice(index, 1);
-        localStorage.setItem('ippad_gallery', JSON.stringify(photos));
+        sysStorage.setItem('ippad_gallery', JSON.stringify(photos));
       });
 
   deleteAction.then(({ error } = {}) => {
@@ -1891,7 +1889,7 @@ function renderVideos() {
         if (error) throw error;
         return data || [];
       })
-    : Promise.resolve(JSON.parse(localStorage.getItem('ippad_videos') || '[]'));
+    : Promise.resolve(JSON.parse(sysStorage.getItem('ippad_videos') || '[]'));
 
   fetchAction.then(videos => {
     if (videos.length === 0) {
@@ -1949,9 +1947,9 @@ function handleAddVideo(event) {
     ? supabase.from('videos').insert([newV])
     : Promise.resolve().then(() => {
         newV.embedUrl = url;
-        const videos = JSON.parse(localStorage.getItem('ippad_videos') || '[]');
+        const videos = JSON.parse(sysStorage.getItem('ippad_videos') || '[]');
         videos.push(newV);
-        localStorage.setItem('ippad_videos', JSON.stringify(videos));
+        sysStorage.setItem('ippad_videos', JSON.stringify(videos));
       });
 
   addAction.then(({ error } = {}) => {
@@ -1972,9 +1970,9 @@ function deleteVideo(id) {
   const deleteAction = supabase
     ? supabase.from('videos').delete().eq('id', id)
     : Promise.resolve().then(() => {
-        let videos = JSON.parse(localStorage.getItem('ippad_videos') || '[]');
+        let videos = JSON.parse(sysStorage.getItem('ippad_videos') || '[]');
         videos = videos.filter(v => v.id !== id);
-        localStorage.setItem('ippad_videos', JSON.stringify(videos));
+        sysStorage.setItem('ippad_videos', JSON.stringify(videos));
       });
 
   deleteAction.then(({ error } = {}) => {
@@ -1990,16 +1988,16 @@ function deleteVideo(id) {
 // Reset Database Defaults
 function resetDefaults() {
   if (confirm("WARNING: This will restore the database to its clean, initial installation states. All your added announcements, photos, and video items will be overwritten. Proceed?")) {
-    localStorage.removeItem('ippad_initialized');
-    localStorage.removeItem('ippad_gallery');
-    localStorage.removeItem('ippad_posts');
-    localStorage.removeItem('ippad_event_heroes');
-    localStorage.removeItem('ippad_videos');
-    localStorage.removeItem('ippad_hero_photo');
-    localStorage.removeItem('ippad_hero_badge');
-    localStorage.removeItem('ippad_hero_title');
-    localStorage.removeItem('ippad_hero_motto');
-    localStorage.removeItem('ippad_hero_desc');
+    sysStorage.removeItem('ippad_initialized');
+    sysStorage.removeItem('ippad_gallery');
+    sysStorage.removeItem('ippad_posts');
+    sysStorage.removeItem('ippad_event_heroes');
+    sysStorage.removeItem('ippad_videos');
+    sysStorage.removeItem('ippad_hero_photo');
+    sysStorage.removeItem('ippad_hero_badge');
+    sysStorage.removeItem('ippad_hero_title');
+    sysStorage.removeItem('ippad_hero_motto');
+    sysStorage.removeItem('ippad_hero_desc');
     
     initSystemData();
     loadHeroForm();

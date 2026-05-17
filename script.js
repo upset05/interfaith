@@ -1,11 +1,11 @@
 // --- SAFE STORAGE FALLBACK ---
-const safeLocalStorage = {
+const sysStorage = {
   _data: {},
   getItem: function(key) {
     try {
       return window.localStorage.getItem(key);
     } catch (e) {
-      console.warn("localStorage.getItem blocked, using memory fallback:", e);
+      console.warn("sysStorage.getItem blocked, using memory fallback:", e);
       return this._data[key] || null;
     }
   },
@@ -13,7 +13,7 @@ const safeLocalStorage = {
     try {
       window.localStorage.setItem(key, value);
     } catch (e) {
-      console.warn("localStorage.setItem blocked, using memory fallback:", e);
+      console.warn("sysStorage.setItem blocked, using memory fallback:", e);
       this._data[key] = String(value);
     }
   },
@@ -25,7 +25,6 @@ const safeLocalStorage = {
     }
   }
 };
-const localStorage = safeLocalStorage;
 
 // --- CONFIGURATION CONSTANTS ---
 // Paste your Supabase project credentials here to go live globally!
@@ -347,12 +346,12 @@ const defaultGalleryImages = [
 
 // Initialize dynamic system data if not already set
 function initSystemData() {
-  if (!localStorage.getItem('ippad_initialized')) {
-    localStorage.setItem('ippad_hero_photo', 'WhatsApp Image 2026-05-07 at 1.27.03 PM.jpeg');
-    localStorage.setItem('ippad_hero_badge', 'Different Faiths, One Humanity');
-    localStorage.setItem('ippad_hero_title', 'Imams & Pastors<br/><em>Interfaith Forum</em><br/>for Peace & Development');
-    localStorage.setItem('ippad_hero_motto', 'IPPAD — Different Faiths, One Humanity');
-    localStorage.setItem('ippad_hero_desc', 'A faith-based, non-partisan platform uniting Muslim and Christian leaders to build peaceful, healthy, and resilient communities across Nigeria — through structured dialogue, trauma healing, and measurable community action.');
+  if (!sysStorage.getItem('ippad_initialized')) {
+    sysStorage.setItem('ippad_hero_photo', 'WhatsApp Image 2026-05-07 at 1.27.03 PM.jpeg');
+    sysStorage.setItem('ippad_hero_badge', 'Different Faiths, One Humanity');
+    sysStorage.setItem('ippad_hero_title', 'Imams & Pastors<br/><em>Interfaith Forum</em><br/>for Peace & Development');
+    sysStorage.setItem('ippad_hero_motto', 'IPPAD — Different Faiths, One Humanity');
+    sysStorage.setItem('ippad_hero_desc', 'A faith-based, non-partisan platform uniting Muslim and Christian leaders to build peaceful, healthy, and resilient communities across Nigeria — through structured dialogue, trauma healing, and measurable community action.');
     
     // Default posts
     const defaultPosts = [
@@ -371,7 +370,7 @@ function initSystemData() {
         image: "WhatsApp Image 2026-05-07 at 1.27.13 PM (2).jpeg"
       }
     ];
-    localStorage.setItem('ippad_posts', JSON.stringify(defaultPosts));
+    sysStorage.setItem('ippad_posts', JSON.stringify(defaultPosts));
 
     // Default Event Hero Photos
     const defaultEventHeroes = [
@@ -390,7 +389,7 @@ function initSystemData() {
         image: "WhatsApp Image 2026-05-07 at 1.28.10 PM.jpeg"
       }
     ];
-    localStorage.setItem('ippad_event_heroes', JSON.stringify(defaultEventHeroes));
+    sysStorage.setItem('ippad_event_heroes', JSON.stringify(defaultEventHeroes));
 
     // Default Videos
     const defaultVideos = [
@@ -407,13 +406,13 @@ function initSystemData() {
         embedUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ"
       }
     ];
-    localStorage.setItem('ippad_videos', JSON.stringify(defaultVideos));
+    sysStorage.setItem('ippad_videos', JSON.stringify(defaultVideos));
 
     // Gallery images
-    localStorage.setItem('ippad_gallery', JSON.stringify(defaultGalleryImages));
+    sysStorage.setItem('ippad_gallery', JSON.stringify(defaultGalleryImages));
     
     // Set initialization flag
-    localStorage.setItem('ippad_initialized', 'true');
+    sysStorage.setItem('ippad_initialized', 'true');
   }
 }
 
@@ -440,11 +439,11 @@ function getHeroContent() {
 
 function getDefaultHeroLocal() {
   return {
-    badge: localStorage.getItem('ippad_hero_badge') || 'Different Faiths, One Humanity',
-    title: localStorage.getItem('ippad_hero_title') || 'Imams & Pastors<br/><em>Interfaith Forum</em>',
-    motto: localStorage.getItem('ippad_hero_motto') || 'IPPAD — Different Faiths, One Humanity',
-    desc: localStorage.getItem('ippad_hero_desc') || 'A faith-based, non-partisan platform uniting Muslim and Christian leaders to build peaceful, healthy, and resilient communities across Nigeria — through structured dialogue, trauma healing, and measurable community action.',
-    photo: localStorage.getItem('ippad_hero_photo') || 'WhatsApp Image 2026-05-01 at 5.53.05 PM.jpeg'
+    badge: sysStorage.getItem('ippad_hero_badge') || 'Different Faiths, One Humanity',
+    title: sysStorage.getItem('ippad_hero_title') || 'Imams & Pastors<br/><em>Interfaith Forum</em>',
+    motto: sysStorage.getItem('ippad_hero_motto') || 'IPPAD — Different Faiths, One Humanity',
+    desc: sysStorage.getItem('ippad_hero_desc') || 'A faith-based, non-partisan platform uniting Muslim and Christian leaders to build peaceful, healthy, and resilient communities across Nigeria — through structured dialogue, trauma healing, and measurable community action.',
+    photo: sysStorage.getItem('ippad_hero_photo') || 'WhatsApp Image 2026-05-01 at 5.53.05 PM.jpeg'
   };
 }
 
@@ -455,10 +454,10 @@ function getPostsList() {
       return data || [];
     }).catch(err => {
       console.warn("Supabase fetch posts failed, fallback to local storage:", err);
-      return JSON.parse(localStorage.getItem('ippad_posts') || '[]');
+      return JSON.parse(sysStorage.getItem('ippad_posts') || '[]');
     });
   }
-  return Promise.resolve(JSON.parse(localStorage.getItem('ippad_posts') || '[]'));
+  return Promise.resolve(JSON.parse(sysStorage.getItem('ippad_posts') || '[]'));
 }
 
 function getEventHeroesList() {
@@ -468,10 +467,10 @@ function getEventHeroesList() {
       return data || [];
     }).catch(err => {
       console.warn("Supabase fetch event heroes failed, fallback to local storage:", err);
-      return JSON.parse(localStorage.getItem('ippad_event_heroes') || '[]');
+      return JSON.parse(sysStorage.getItem('ippad_event_heroes') || '[]');
     });
   }
-  return Promise.resolve(JSON.parse(localStorage.getItem('ippad_event_heroes') || '[]'));
+  return Promise.resolve(JSON.parse(sysStorage.getItem('ippad_event_heroes') || '[]'));
 }
 
 function getGalleryPhotosList() {
@@ -481,10 +480,10 @@ function getGalleryPhotosList() {
       return (data || []).map(item => item.image_url);
     }).catch(err => {
       console.warn("Supabase fetch gallery failed, fallback to local storage:", err);
-      return JSON.parse(localStorage.getItem('ippad_gallery') || '[]');
+      return JSON.parse(sysStorage.getItem('ippad_gallery') || '[]');
     });
   }
-  return Promise.resolve(JSON.parse(localStorage.getItem('ippad_gallery') || '[]'));
+  return Promise.resolve(JSON.parse(sysStorage.getItem('ippad_gallery') || '[]'));
 }
 
 function getVideosList() {
@@ -499,10 +498,10 @@ function getVideosList() {
       }));
     }).catch(err => {
       console.warn("Supabase fetch videos failed, fallback to local storage:", err);
-      return JSON.parse(localStorage.getItem('ippad_videos') || '[]');
+      return JSON.parse(sysStorage.getItem('ippad_videos') || '[]');
     });
   }
-  return Promise.resolve(JSON.parse(localStorage.getItem('ippad_videos') || '[]'));
+  return Promise.resolve(JSON.parse(sysStorage.getItem('ippad_videos') || '[]'));
 }
 
 // --- DYNAMIC RENDERING CONTROLLER ---
