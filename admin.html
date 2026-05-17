@@ -661,7 +661,7 @@ header {
     <img src="logo.jpeg" alt="IPPAD Logo" class="login-logo"/>
     <h2>IPPAD Admin Portal</h2>
     <p>Please enter the administrative password to manage the website content.</p>
-    <form id="loginForm" onsubmit="event.preventDefault(); handleLogin(event); return false;">
+    <form id="loginForm" onsubmit="try { handleLogin(event); } catch(e) { console.error(e); } return false;">
       <div class="input-group">
         <label for="password">Security Password</label>
         <input type="password" id="password" placeholder="Enter password..." required autofocus autocomplete="current-password"/>
@@ -735,7 +735,7 @@ header {
           <p>Update homepage presentation title, descriptions, motto badge and background hero picture.</p>
         </div>
       </div>
-      <form id="heroForm" onsubmit="event.preventDefault(); saveHeroContent(event); return false;">
+      <form id="heroForm" onsubmit="try { saveHeroContent(event); } catch(e) { console.error(e); } return false;">
         <div class="input-group">
           <label for="hero_badge">Motto Badge (Top Ribbon)</label>
           <input type="text" id="hero_badge" required/>
@@ -844,7 +844,7 @@ header {
       <h3>New Announcement</h3>
       <button class="modal-close" onclick="closeModal('modalPost')">&times;</button>
     </div>
-    <form onsubmit="event.preventDefault(); handleAddPost(event); return false;">
+    <form onsubmit="try { handleAddPost(event); } catch(e) { console.error(e); } return false;">
       <div class="modal-body">
         <div class="input-group">
           <label for="post_title">Title</label>
@@ -892,7 +892,7 @@ header {
       <h3>New Featured Event Hero Photo</h3>
       <button class="modal-close" onclick="closeModal('modalEvent')">&times;</button>
     </div>
-    <form onsubmit="event.preventDefault(); handleAddEvent(event); return false;">
+    <form onsubmit="try { handleAddEvent(event); } catch(e) { console.error(e); } return false;">
       <div class="modal-body">
         <div class="input-group">
           <label for="event_title">Event Title</label>
@@ -940,7 +940,7 @@ header {
       <h3>Add Photo to Gallery</h3>
       <button class="modal-close" onclick="closeModal('modalGallery')">&times;</button>
     </div>
-    <form onsubmit="event.preventDefault(); handleAddGallery(event); return false;">
+    <form onsubmit="try { handleAddGallery(event); } catch(e) { console.error(e); } return false;">
       <div class="modal-body">
         <div class="input-group">
           <label>Choose Photo</label>
@@ -976,7 +976,7 @@ header {
       <h3>Add Video to Library</h3>
       <button class="modal-close" onclick="closeModal('modalVideo')">&times;</button>
     </div>
-    <form onsubmit="event.preventDefault(); handleAddVideo(event); return false;">
+    <form onsubmit="try { handleAddVideo(event); } catch(e) { console.error(e); } return false;">
       <div class="modal-body">
         <div class="input-group">
           <label for="video_title">Video Title</label>
