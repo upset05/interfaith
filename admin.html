@@ -749,11 +749,13 @@ header {
     <img src="logo.jpeg" alt="IPPAD Logo" class="login-logo"/>
     <h2>Admin Access</h2>
     <p style="margin-bottom: 24px;">Please enter the administrative password to manage the website content.</p>
-    <div style="margin-bottom: 24px;">
-      <input type="password" id="password" placeholder="Enter Security Key" style="width: 100%; padding: 16px; background: rgba(255,255,255,0.9); border: 2px solid var(--border); border-radius: 16px; color: var(--text); font-size: 16px; text-align: center; font-family: 'Outfit', sans-serif;" autofocus autocomplete="current-password"/>
-    </div>
-    <button onclick="handleLogin()" class="btn-submit" style="width: 100%; padding: 16px; font-size: 16px; border-radius: 16px;">Verify & Enter</button>
-    <div class="error-message" id="errorMessage" style="margin-top: 16px;">Authentication Failed. Invalid passcode.</div>
+    <form id="loginForm" onsubmit="handleLogin(event); return false;" autocomplete="on">
+      <div style="margin-bottom: 24px;">
+        <input type="password" id="password" placeholder="Enter Security Key" style="width: 100%; padding: 16px; background: rgba(255,255,255,0.9); border: 2px solid var(--border); border-radius: 16px; color: var(--text); font-size: 16px; text-align: center; font-family: 'Outfit', sans-serif;" autofocus autocomplete="current-password"/>
+      </div>
+      <button type="submit" class="btn-submit" style="width: 100%; padding: 16px; font-size: 16px; border-radius: 16px;">Verify & Enter</button>
+      <div class="error-message" id="errorMessage" style="margin-top: 16px;">Authentication Failed. Invalid passcode.</div>
+    </form>
   </div>
 </div>
 
@@ -770,7 +772,7 @@ header {
   <div class="header-actions">
     <a href="index.html" class="btn-secondary" target="_blank"><i data-lucide="external-link"></i> <span>Live Website</span></a>
     <button onclick="handleLogout()" class="btn-danger-outline">Lock Portal</button>
-    <button class="mobile-menu-btn" id="sidebarToggle" aria-label="Open menu" onclick="openSidebar()">
+    <button class="mobile-menu-btn" id="sidebarToggle" aria-label="Open menu">
       <span></span><span></span><span></span>
     </button>
   </div>
