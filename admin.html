@@ -1358,8 +1358,13 @@ function updateFileLabel(inputId, filename) {
 
 // --- AUTHENTICATION MODULE ---
 window.onload = function() {
-  if (sessionStorage.getItem('ippad_admin_logged_in') === 'true') {
-    document.getElementById('loginOverlay').style.display = 'none';
+  try {
+    if (sessionStorage.getItem('ippad_admin_logged_in') === 'true') {
+      const overlay = document.getElementById('loginOverlay');
+      if (overlay) overlay.style.display = 'none';
+    }
+  } catch(e) {
+    console.warn("sessionStorage not available", e);
   }
   
   // Render dropdown pickers and content lists
@@ -1375,7 +1380,8 @@ function handleLogin(event) {
   if (event && typeof event.preventDefault === 'function') {
     event.preventDefault();
   }
-  const pass = document.getElementById('password').value;
+  const passInput = document.getElementById('password');
+  const pass = passInput ? passInput.value.trim() : '';
   
   if (pass === 'ippad2026') {
     try {
@@ -1415,10 +1421,17 @@ function handleLogin(event) {
 }
 
 function handleLogout() {
-  sessionStorage.removeItem('ippad_admin_logged_in');
-  document.getElementById('loginOverlay').style.display = 'flex';
-  document.getElementById('password').value = '';
-  document.getElementById('errorMessage').style.display = 'none';
+  try {
+    sessionStorage.removeItem('ippad_admin_logged_in');
+  } catch(e) {
+    console.warn("sessionStorage not available", e);
+  }
+  const overlay = document.getElementById('loginOverlay');
+  if (overlay) overlay.style.display = 'flex';
+  const passInput = document.getElementById('password');
+  if (passInput) passInput.value = '';
+  const errorMsg = document.getElementById('errorMessage');
+  if (errorMsg) errorMsg.style.display = 'none';
 }
 
 // --- TAB ROUTER ---
