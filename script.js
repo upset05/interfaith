@@ -783,14 +783,16 @@ function initLiveUpdates() {
   renderVideosUI();
 }
 
-// Invoke initialization
-initSystemData();
-
-// Populate Gallery, Videos, Posts and text
+// Populate Gallery, Videos, Posts, bind hamburger
 document.addEventListener('DOMContentLoaded', () => {
   initLiveUpdates();
+
+  // Bind hamburger buttons via JS (reliable on all hosts — no inline onclick needed)
+  document.querySelectorAll('.hamburger').forEach(btn => {
+    btn.addEventListener('click', toggleMenu);
+  });
 });
 
-// Explicit global registrations for inline HTML event handlers
+// Keep as global fallback in case any page still has onclick="toggleMenu()"
 window.toggleMenu = toggleMenu;
 
