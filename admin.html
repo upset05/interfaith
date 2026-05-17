@@ -749,15 +749,87 @@ header {
     <img src="logo.jpeg" alt="IPPAD Logo" class="login-logo"/>
     <h2>Admin Access</h2>
     <p style="margin-bottom: 24px;">Please enter the administrative password to manage the website content.</p>
-    <form id="loginForm" onsubmit="handleLogin(event); return false;" autocomplete="on">
+    <div id="loginFormWrapper">
       <div style="margin-bottom: 24px;">
-        <input type="password" id="password" placeholder="Enter Security Key" style="width: 100%; padding: 16px; background: rgba(255,255,255,0.9); border: 2px solid var(--border); border-radius: 16px; color: var(--text); font-size: 16px; text-align: center; font-family: 'Outfit', sans-serif;" autofocus autocomplete="current-password"/>
+        <input type="password" id="password" placeholder="Enter Security Key" style="width: 100%; padding: 16px; background: rgba(255,255,255,0.9); border: 2px solid var(--border); border-radius: 16px; color: var(--text); font-size: 16px; text-align: center; font-family: 'Outfit', sans-serif;" autofocus/>
       </div>
-      <button type="submit" class="btn-submit" style="width: 100%; padding: 16px; font-size: 16px; border-radius: 16px;">Verify & Enter</button>
+      <button type="button" id="loginBtn" class="btn-submit" style="width: 100%; padding: 16px; font-size: 16px; border-radius: 16px;">Verify & Enter</button>
       <div class="error-message" id="errorMessage" style="margin-top: 16px;">Authentication Failed. Invalid passcode.</div>
-    </form>
+    </div>
   </div>
 </div>
+<script>
+// ============ SELF-CONTAINED LOGIN MODULE ============
+// No dependencies on any other script. Works independently.
+(function() {
+  var CORRECT_PASS = 'ippad2026';
+  var passwordInput = document.getElementById('password');
+  var loginBtn = document.getElementById('loginBtn');
+  var errorMsg = document.getElementById('errorMessage');
+  var overlay = document.getElementById('loginOverlay');
+  var loginCard = document.querySelector('.login-card');
+
+  // Safe session storage
+  function sessionGet(k) { try { return sessionStorage.getItem(k); } catch(e) { return null; } }
+  function sessionSet(k, v) { try { sessionStorage.setItem(k, v); } catch(e) {} }
+  function sessionDel(k) { try { sessionStorage.removeItem(k); } catch(e) {} }
+
+  // Check if already logged in
+  if (sessionGet('ippad_admin_logged_in') === 'true') {
+    overlay.style.display = 'none';
+    var dash = document.getElementById('mainDashboard');
+    if (dash) dash.style.display = 'block';
+  }
+
+  function doLogin() {
+    var pass = passwordInput.value.trim().toLowerCase();
+    if (pass === CORRECT_PASS) {
+      sessionSet('ippad_admin_logged_in', 'true');
+      overlay.style.display = 'none';
+      var dash = document.getElementById('mainDashboard');
+      if (dash) dash.style.display = 'block';
+    } else {
+      errorMsg.style.display = 'block';
+      // Shake
+      loginCard.style.animation = 'none';
+      void loginCard.offsetHeight;
+      loginCard.style.animation = 'shake 0.4s';
+    }
+  }
+
+  // Add shake keyframes
+  var s = document.createElement('style');
+  s.textContent = '@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-10px)}75%{transform:translateX(10px)}}';
+  document.head.appendChild(s);
+
+  // Click handler
+  loginBtn.addEventListener('click', doLogin);
+
+  // Enter key handler
+  passwordInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' || e.keyCode === 13) {
+      e.preventDefault();
+      doLogin();
+    }
+  });
+
+  // Expose logout globally for the header button
+  window.handleLogout = function() {
+    sessionDel('ippad_admin_logged_in');
+    overlay.style.display = 'flex';
+    var dash = document.getElementById('mainDashboard');
+    if (dash) dash.style.display = 'none';
+    passwordInput.value = '';
+    errorMsg.style.display = 'none';
+  };
+
+  // Also expose handleLogin globally for backward compat
+  window.handleLogin = function(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    doLogin();
+  };
+})();
+</script>
 
 <!-- MAIN ADMIN INTERFACE -->
 <div id="mainDashboard" style="display: none;">
@@ -772,14 +844,52 @@ header {
   <div class="header-actions">
     <a href="index.html" class="btn-secondary" target="_blank"><i data-lucide="external-link"></i> <span>Live Website</span></a>
     <button onclick="handleLogout()" class="btn-danger-outline">Lock Portal</button>
-    <button class="mobile-menu-btn" id="sidebarToggle" aria-label="Open menu">
+    <button class="mobile-menu-btn" id="sidebarToggle" aria-label="Open menu" onclick="openSidebar()">
       <span></span><span></span><span></span>
     </button>
   </div>
 </header>
 
 <!-- Sidebar backdrop overlay (mobile only) -->
-<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+<script>
+// ============ SELF-CONTAINED MOBILE SIDEBAR MODULE ============
+// Elements are looked up at CALL TIME (not init time) because
+// adminSidebar and sidebarClose appear later in the DOM.
+(function() {
+  function openSidebar() {
+    var sidebar = document.getElementById('adminSidebar');
+    var overlay = document.getElementById('sidebarOverlay');
+    var closeBtn = document.getElementById('sidebarClose');
+    if (sidebar) sidebar.classList.add('open');
+    if (overlay) overlay.classList.add('open');
+    if (closeBtn) closeBtn.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeSidebar() {
+    var sidebar = document.getElementById('adminSidebar');
+    var overlay = document.getElementById('sidebarOverlay');
+    var closeBtn = document.getElementById('sidebarClose');
+    if (sidebar) sidebar.classList.remove('open');
+    if (overlay) overlay.classList.remove('open');
+    if (closeBtn) closeBtn.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+
+  // Wire up the hamburger button (exists in DOM already)
+  var toggleBtn = document.getElementById('sidebarToggle');
+  if (toggleBtn) toggleBtn.addEventListener('click', openSidebar);
+
+  // Wire up the overlay backdrop (exists in DOM already)
+  var overlayEl = document.getElementById('sidebarOverlay');
+  if (overlayEl) overlayEl.addEventListener('click', closeSidebar);
+
+  // Expose globally for inline onclick handlers (tab switching, close button)
+  window.openSidebar = openSidebar;
+  window.closeSidebar = closeSidebar;
+})();
+</script>
 
 <div class="admin-container">
   <!-- SIDEBAR MENU -->
@@ -1481,89 +1591,16 @@ function updateFileLabel(inputId, filename) {
   }
 }
 
-// --- AUTHENTICATION MODULE ---
+// --- INITIALIZATION (runs after all scripts are loaded) ---
 window.onload = function() {
-  try {
-    if (sysSessionStorage.getItem('ippad_admin_logged_in') === 'true') {
-      const overlay = document.getElementById('loginOverlay');
-      const dash = document.getElementById('mainDashboard');
-      if (overlay) overlay.style.display = 'none';
-      if (dash) dash.style.display = 'block';
-    }
-  } catch(e) {
-    console.warn("sysSessionStorage not available", e);
-  }
-  
   // Render dropdown pickers and content lists
-  initPickers();
-  renderAllContent();
-  loadHeroForm();
+  try { initPickers(); } catch(e) { console.error('initPickers error:', e); }
+  try { renderAllContent(); } catch(e) { console.error('renderAllContent error:', e); }
+  try { loadHeroForm(); } catch(e) { console.error('loadHeroForm error:', e); }
   
   // Initialize Lucide icons
   if (window.lucide) lucide.createIcons();
 };
-
-function handleLogin(event) {
-  if (event && typeof event.preventDefault === 'function') {
-    event.preventDefault();
-  }
-  const passInput = document.getElementById('password');
-  const pass = passInput ? passInput.value.trim().toLowerCase() : '';
-  
-  if (pass === 'ippad2026') {
-    try {
-      sysSessionStorage.setItem('ippad_admin_logged_in', 'true');
-    } catch(e) {
-      console.warn("sysSessionStorage not available", e);
-    }
-    const overlay = document.getElementById('loginOverlay');
-    const dash = document.getElementById('mainDashboard');
-    if (overlay) overlay.style.display = 'none';
-    if (dash) dash.style.display = 'block';
-    if (typeof showToast === 'function') showToast("Authentication successful! Welcome to IPPAD Portal.");
-  } else {
-    const errorMsg = document.getElementById('errorMessage');
-    if (errorMsg) errorMsg.style.display = 'block';
-    
-    // Shake animation
-    const card = document.querySelector('.login-card');
-    if (card) {
-      card.style.animation = 'none';
-      card.offsetHeight; // trigger reflow
-      card.style.animation = 'shake 0.4s';
-    }
-    
-    // Add custom shake keyframes if not present
-    if (!document.getElementById('shake-style')) {
-      const style = document.createElement('style');
-      style.id = 'shake-style';
-      style.innerHTML = `
-        @keyframes shake {
-          0%, 100% { transform: translateX(0); }
-          25% { transform: translateX(-10px); }
-          75% { transform: translateX(10px); }
-        }
-      `;
-      document.head.appendChild(style);
-    }
-  }
-}
-
-function handleLogout() {
-  try {
-    sysSessionStorage.removeItem('ippad_admin_logged_in');
-  } catch(e) {
-    console.warn("sysSessionStorage not available", e);
-  }
-  const overlay = document.getElementById('loginOverlay');
-  const dash = document.getElementById('mainDashboard');
-  if (overlay) overlay.style.display = 'flex';
-  if (dash) dash.style.display = 'none';
-  const passInput = document.getElementById('password');
-  if (passInput) passInput.value = '';
-  const errorMsg = document.getElementById('errorMessage');
-  if (errorMsg) errorMsg.style.display = 'none';
-}
 
 // --- TAB ROUTER ---
 function switchTab(tabId, btn) {
@@ -1574,36 +1611,10 @@ function switchTab(tabId, btn) {
   btn.classList.add('active');
   
   // Auto-close sidebar drawer on mobile when a tab is selected
-  closeSidebar();
+  if (typeof closeSidebar === 'function') closeSidebar();
 
   if (window.lucide) lucide.createIcons();
 }
-
-// --- MOBILE SIDEBAR DRAWER ---
-function openSidebar() {
-  document.getElementById('adminSidebar').classList.add('open');
-  document.getElementById('sidebarOverlay').classList.add('open');
-  document.getElementById('sidebarClose').style.display = 'block';
-  document.body.style.overflow = 'hidden';
-}
-
-function closeSidebar() {
-  const sidebar = document.getElementById('adminSidebar');
-  const overlay = document.getElementById('sidebarOverlay');
-  const closeBtn = document.getElementById('sidebarClose');
-  if (sidebar) sidebar.classList.remove('open');
-  if (overlay) overlay.classList.remove('open');
-  if (closeBtn) closeBtn.style.display = 'none';
-  document.body.style.overflow = '';
-}
-
-// Wire up toggle button and overlay after DOM ready
-document.addEventListener('DOMContentLoaded', () => {
-  const toggleBtn = document.getElementById('sidebarToggle');
-  const overlay = document.getElementById('sidebarOverlay');
-  if (toggleBtn) toggleBtn.addEventListener('click', openSidebar);
-  if (overlay) overlay.addEventListener('click', closeSidebar);
-});
 
 // --- MOCK IMAGE PICKER GENERATOR ---
 function initPickers() {
@@ -2217,9 +2228,7 @@ function showToast(text) {
   }, 3500);
 }
 
-// Explicit global window registrations
-window.handleLogin = handleLogin;
-window.handleLogout = handleLogout;
+// Explicit global window registrations (login/logout/sidebar handled by self-contained modules above)
 window.switchTab = switchTab;
 window.openModal = openModal;
 window.closeModal = closeModal;
