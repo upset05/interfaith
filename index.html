@@ -26,6 +26,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="style.css">
 <script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 </head>
 <body>
 
@@ -69,11 +70,11 @@
 <div class="page" id="page-home">
 
   <div class="hero">
-    <div class="hero-left" style="background: linear-gradient(155deg, rgba(26,92,56,0.92) 0%, rgba(13,51,32,0.95) 100%), url('WhatsApp Image 2026-05-07 at 1.27.03 PM.jpeg') center/cover;">
-      <div class="hero-badge">Different Faiths, One Humanity</div>
-      <h1>Imams &amp; Pastors<br/><em>Interfaith Forum</em><br/>for Peace &amp; Development</h1>
-      <p class="hero-motto">IPPAD — Different Faiths, One Humanity</p>
-      <p class="hero-desc">A faith-based, non-partisan platform uniting Muslim and Christian leaders to build peaceful, healthy, and resilient communities across Nigeria — through structured dialogue, trauma healing, and measurable community action.</p>
+    <div class="hero-left" id="hero-left-section" style="background: linear-gradient(155deg, rgba(26,92,56,0.92) 0%, rgba(13,51,32,0.95) 100%), url('WhatsApp Image 2026-05-07 at 1.27.03 PM.jpeg') center/cover;">
+      <div class="hero-badge" id="hero-badge-elem">Different Faiths, One Humanity</div>
+      <h1 id="hero-title-elem">Imams &amp; Pastors<br/><em>Interfaith Forum</em><br/>for Peace &amp; Development</h1>
+      <p class="hero-motto" id="hero-motto-elem">IPPAD — Different Faiths, One Humanity</p>
+      <p class="hero-desc" id="hero-desc-elem">A faith-based, non-partisan platform uniting Muslim and Christian leaders to build peaceful, healthy, and resilient communities across Nigeria — through structured dialogue, trauma healing, and measurable community action.</p>
       <div class="hero-btns">
         <a href="programs.html" class="btn-gold">Our Programs</a>
         <a href="about.html" class="btn-white-outline">Our Story</a>
@@ -141,6 +142,16 @@
   <div class="quote-section">
     <blockquote>"While religion has the power to unite, it is often left unstructured. Yet at their core, Islam and Christianity both uphold shared values — human dignity, justice, compassion, and peace."</blockquote>
     <cite>— Bishop Dr. Sam Moses Tukura, JP &nbsp;·&nbsp; Founder / Executive Director, IPPAD</cite>
+  </div>
+
+  <!-- ANNOUNCEMENTS -->
+  <div class="section" id="announcements-section" style="display: none; background: var(--grey); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+    <div class="section-label">Latest News</div>
+    <h2 class="section-title">Announcements &amp; <em>Updates</em></h2>
+    <p class="section-sub">Stay informed with the latest updates from IPPAD's workshops, summits, and peace missions across Nigeria.</p>
+    <div class="card-grid" id="announcementsGrid">
+      <!-- Injected dynamically -->
+    </div>
   </div>
 
   <!-- PROGRAMS PREVIEW -->
@@ -247,7 +258,10 @@
   </div>
   <div class="footer-bottom">
     <span>© 2025 IPPAD — Imams &amp; Pastors Interfaith Forum for Peace and Development. All rights reserved.</span>
-    <span style="color:rgba(255,255,255,.4);">interfaithlink.org</span>
+    <span>
+      <a href="admin.html" style="color: rgba(255,255,255,.4); text-decoration: none; margin-right: 15px;" onmouseover="this.style.color='#c9a227'" onmouseout="this.style.color='rgba(255,255,255,.4)'">Admin Portal</a>
+      <span style="color:rgba(255,255,255,.4);">interfaithlink.org</span>
+    </span>
   </div>
 </footer>
 

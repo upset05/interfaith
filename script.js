@@ -1,3 +1,118 @@
+// --- CONFIGURATION CONSTANTS ---
+// Paste your Supabase project credentials here to go live globally!
+const SUPABASE_URL = "https://jdgzxvwgvmssayobbdrz.supabase.co"; 
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpkZ3p4dndndm1zc2F5b2JiZHJ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkwMTMxMDgsImV4cCI6MjA5NDU4OTEwOH0.2OydMDLfRXz5dT0lrHwk4SVOPJom4wC86FCXDJ5FLzQ";
+
+let supabase = null;
+
+// Initialize Supabase dynamically and wait for the library to be ready
+function initSupabase() {
+  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) return;
+  
+  const tryInit = () => {
+    const lib = window.supabase;
+    if (lib && typeof lib.createClient === 'function') {
+      try {
+        supabase = lib.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        console.log("Supabase Client initialized successfully!");
+        // Re-trigger layout renders once Supabase is connected
+        if (typeof initLiveUpdates === 'function') {
+          initLiveUpdates();
+        }
+      } catch (e) {
+        console.error("Failed to initialize Supabase client:", e);
+      }
+    } else {
+      // Retry in 50ms
+      setTimeout(tryInit, 50);
+    }
+  };
+  
+  tryInit();
+}
+
+initSupabase();
+
+// --- INDEXEDDB MEDIA CACHE ENGINE ---
+const DB_NAME = 'ippad_media_db';
+const DB_VERSION = 1;
+const STORE_NAME = 'media';
+
+function getDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, DB_VERSION);
+    request.onupgradeneeded = (e) => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains(STORE_NAME)) {
+        db.createObjectStore(STORE_NAME);
+      }
+    };
+    request.onsuccess = (e) => resolve(e.target.result);
+    request.onerror = (e) => reject(e.target.error);
+  });
+}
+
+function saveMedia(key, file) {
+  return getDB().then(db => {
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction(STORE_NAME, 'readwrite');
+      const store = transaction.objectStore(STORE_NAME);
+      const request = store.put(file, key);
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+    });
+  });
+}
+
+function getMedia(key) {
+  return getDB().then(db => {
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction(STORE_NAME, 'readonly');
+      const store = transaction.objectStore(STORE_NAME);
+      const request = store.get(key);
+      request.onsuccess = (e) => resolve(e.target.result);
+      request.onerror = (e) => reject(request.error);
+    });
+  });
+}
+
+function resolveMediaSrc(element, src, property = 'src') {
+  if (!src) return Promise.resolve(src);
+  if (src.startsWith('http://') || src.startsWith('https://') || src.startsWith('data:')) {
+    if (element) element[property] = src;
+    return Promise.resolve(src);
+  }
+  
+  // If Supabase is active, check if it's a file path to resolve from storage bucket
+  if (supabase) {
+    try {
+      const { data } = supabase.storage.from('images').getPublicUrl(src);
+      if (data && data.publicUrl) {
+        const publicUrl = data.publicUrl;
+        if (element) element[property] = publicUrl;
+        return Promise.resolve(publicUrl);
+      }
+    } catch (e) {
+      console.warn("Failed to get public URL from Supabase storage:", e);
+    }
+  }
+  
+  return getMedia(src).then(file => {
+    if (file) {
+      const objectUrl = URL.createObjectURL(file);
+      if (element) {
+        element[property] = objectUrl;
+      }
+      return objectUrl;
+    }
+    if (element) element[property] = src;
+    return src;
+  }).catch(err => {
+    if (element) element[property] = src;
+    return src;
+  });
+}
+
 function toggleMenu() {
   document.getElementById('mobileMenu').classList.toggle('open');
 }
@@ -36,8 +151,8 @@ if (window.lucide) {
   lucide.createIcons();
 }
 
-// All Gallery Images
-const galleryImages = [
+// All Gallery Images (Default Fallback)
+const defaultGalleryImages = [
   "WhatsApp Image 2026-05-01 at 5.53.05 PM (1).jpeg",
   "WhatsApp Image 2026-05-01 at 5.53.05 PM.jpeg",
   "WhatsApp Image 2026-05-04 at 1.56.34 PM.jpeg",
@@ -201,13 +316,304 @@ const galleryImages = [
   "WhatsApp Image 2026-05-07 at 1.28.20 PM.jpeg"
 ];
 
-// Populate Gallery if container exists
-document.addEventListener('DOMContentLoaded', () => {
+// Initialize dynamic system data if not already set
+function initSystemData() {
+  if (!localStorage.getItem('ippad_initialized')) {
+    localStorage.setItem('ippad_hero_photo', 'WhatsApp Image 2026-05-07 at 1.27.03 PM.jpeg');
+    localStorage.setItem('ippad_hero_badge', 'Different Faiths, One Humanity');
+    localStorage.setItem('ippad_hero_title', 'Imams & Pastors<br/><em>Interfaith Forum</em><br/>for Peace & Development');
+    localStorage.setItem('ippad_hero_motto', 'IPPAD — Different Faiths, One Humanity');
+    localStorage.setItem('ippad_hero_desc', 'A faith-based, non-partisan platform uniting Muslim and Christian leaders to build peaceful, healthy, and resilient communities across Nigeria — through structured dialogue, trauma healing, and measurable community action.');
+    
+    // Default posts
+    const defaultPosts = [
+      {
+        id: "post_1",
+        title: "Peace Accord Signed in Zaria",
+        date: "May 12, 2026",
+        content: "Christian and Muslim youth groups officially signed a communal peace accord, pledging to reject violence and instead pool resources to support local farming cooperatives.",
+        image: "WhatsApp Image 2026-05-07 at 1.27.03 PM (1).jpeg"
+      },
+      {
+        id: "post_2",
+        title: "Grassroots Trauma Healing Workshop",
+        date: "April 28, 2026",
+        content: "Over 80 community members from conflict-affected districts in Jos participated in a three-day psychological support session organized by IPPAD's clinical unit.",
+        image: "WhatsApp Image 2026-05-07 at 1.27.13 PM (2).jpeg"
+      }
+    ];
+    localStorage.setItem('ippad_posts', JSON.stringify(defaultPosts));
+
+    // Default Event Hero Photos
+    const defaultEventHeroes = [
+      {
+        id: "eh_1",
+        title: "Advocacy Summit on National Unity",
+        date: "April 2026",
+        description: "Clergy leaders and civil society delegates formulating action strategies for joint interfaith committees.",
+        image: "WhatsApp Image 2026-05-07 at 1.27.03 PM.jpeg"
+      },
+      {
+        id: "eh_2",
+        title: "Youth Skills & Uplift Program",
+        date: "May 2026",
+        description: "Providing start-up kits and practical agricultural coaching to local youth peace club members.",
+        image: "WhatsApp Image 2026-05-07 at 1.28.10 PM.jpeg"
+      }
+    ];
+    localStorage.setItem('ippad_event_heroes', JSON.stringify(defaultEventHeroes));
+
+    // Default Videos
+    const defaultVideos = [
+      {
+        id: "v_1",
+        title: "IPPAD Interfaith Peace Summit Highlights",
+        description: "Key moments and statements from executive leadership and community champions at the Abuja summit.",
+        embedUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+      },
+      {
+        id: "v_2",
+        title: "Community Cohesion & Dialogue in Middle Belt",
+        description: "An look inside the village mediation committees resolving conflicts in agricultural communities.",
+        embedUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+      }
+    ];
+    localStorage.setItem('ippad_videos', JSON.stringify(defaultVideos));
+
+    // Gallery images
+    localStorage.setItem('ippad_gallery', JSON.stringify(defaultGalleryImages));
+    
+    // Set initialization flag
+    localStorage.setItem('ippad_initialized', 'true');
+  }
+}
+
+// Invoke initialization
+initSystemData();
+
+// --- DUAL-MODE DATA ENGINES (SUPABASE + LOCAL STORAGE) ---
+
+function getHeroContent() {
+  if (supabase) {
+    return supabase.from('hero_content').select('*').eq('id', 'main_hero').single().then(({ data, error }) => {
+      if (error || !data) return getDefaultHeroLocal();
+      return {
+        badge: data.badge,
+        title: data.title,
+        motto: data.motto,
+        desc: data.description,
+        photo: data.photo_url
+      };
+    }).catch(() => getDefaultHeroLocal());
+  }
+  return Promise.resolve(getDefaultHeroLocal());
+}
+
+function getDefaultHeroLocal() {
+  return {
+    badge: localStorage.getItem('ippad_hero_badge') || 'Different Faiths, One Humanity',
+    title: localStorage.getItem('ippad_hero_title') || 'Imams & Pastors<br/><em>Interfaith Forum</em>',
+    motto: localStorage.getItem('ippad_hero_motto') || 'IPPAD — Different Faiths, One Humanity',
+    desc: localStorage.getItem('ippad_hero_desc') || 'A faith-based, non-partisan platform uniting Muslim and Christian leaders to build peaceful, healthy, and resilient communities across Nigeria — through structured dialogue, trauma healing, and measurable community action.',
+    photo: localStorage.getItem('ippad_hero_photo') || 'WhatsApp Image 2026-05-01 at 5.53.05 PM.jpeg'
+  };
+}
+
+function getPostsList() {
+  if (supabase) {
+    return supabase.from('posts').select('*').order('created_at', { ascending: false }).then(({ data, error }) => {
+      if (error) throw error;
+      return data || [];
+    }).catch(err => {
+      console.warn("Supabase fetch posts failed, fallback to local storage:", err);
+      return JSON.parse(localStorage.getItem('ippad_posts') || '[]');
+    });
+  }
+  return Promise.resolve(JSON.parse(localStorage.getItem('ippad_posts') || '[]'));
+}
+
+function getEventHeroesList() {
+  if (supabase) {
+    return supabase.from('event_heroes').select('*').order('created_at', { ascending: false }).then(({ data, error }) => {
+      if (error) throw error;
+      return data || [];
+    }).catch(err => {
+      console.warn("Supabase fetch event heroes failed, fallback to local storage:", err);
+      return JSON.parse(localStorage.getItem('ippad_event_heroes') || '[]');
+    });
+  }
+  return Promise.resolve(JSON.parse(localStorage.getItem('ippad_event_heroes') || '[]'));
+}
+
+function getGalleryPhotosList() {
+  if (supabase) {
+    return supabase.from('gallery').select('*').order('created_at', { ascending: false }).then(({ data, error }) => {
+      if (error) throw error;
+      return (data || []).map(item => item.image_url);
+    }).catch(err => {
+      console.warn("Supabase fetch gallery failed, fallback to local storage:", err);
+      return JSON.parse(localStorage.getItem('ippad_gallery') || '[]');
+    });
+  }
+  return Promise.resolve(JSON.parse(localStorage.getItem('ippad_gallery') || '[]'));
+}
+
+function getVideosList() {
+  if (supabase) {
+    return supabase.from('videos').select('*').order('created_at', { ascending: false }).then(({ data, error }) => {
+      if (error) throw error;
+      return (data || []).map(v => ({
+        id: v.id,
+        title: v.title,
+        description: v.description,
+        embedUrl: v.embed_url
+      }));
+    }).catch(err => {
+      console.warn("Supabase fetch videos failed, fallback to local storage:", err);
+      return JSON.parse(localStorage.getItem('ippad_videos') || '[]');
+    });
+  }
+  return Promise.resolve(JSON.parse(localStorage.getItem('ippad_videos') || '[]'));
+}
+
+// --- DYNAMIC RENDERING CONTROLLER ---
+
+function renderHeroUI() {
+  const heroLeftSection = document.getElementById('hero-left-section');
+  const heroBadgeElem = document.getElementById('hero-badge-elem');
+  const heroTitleElem = document.getElementById('hero-title-elem');
+  const heroMottoElem = document.getElementById('hero-motto-elem');
+  const heroDescElem = document.getElementById('hero-desc-elem');
+
+  getHeroContent().then(hero => {
+    if (heroLeftSection) {
+      resolveMediaSrc(null, hero.photo).then(resolvedSrc => {
+        heroLeftSection.style.background = `linear-gradient(155deg, rgba(26,92,56,0.92) 0%, rgba(13,51,32,0.95) 100%), url('${resolvedSrc}') center/cover`;
+      });
+    }
+    if (heroBadgeElem) heroBadgeElem.innerText = hero.badge;
+    if (heroTitleElem) heroTitleElem.innerHTML = hero.title;
+    if (heroMottoElem) heroMottoElem.innerText = hero.motto;
+    if (heroDescElem) heroDescElem.innerText = hero.desc;
+  });
+}
+
+function renderPostsUI() {
+  const announcementsSection = document.getElementById('announcements-section');
+  const announcementsGrid = document.getElementById('announcementsGrid');
+  if (!announcementsSection || !announcementsGrid) return;
+
+  getPostsList().then(posts => {
+    if (posts.length > 0) {
+      announcementsSection.style.display = 'block';
+      announcementsGrid.innerHTML = '';
+      
+      posts.forEach(post => {
+        const card = document.createElement('div');
+        card.className = 'card reveal';
+        
+        const img = document.createElement('img');
+        img.src = 'logo.jpeg';
+        img.alt = post.title;
+        img.style.width = '100%';
+        img.style.height = '200px';
+        img.style.objectFit = 'cover';
+        img.style.display = 'block';
+        img.style.borderBottom = '4px solid var(--green)';
+        
+        resolveMediaSrc(img, post.image);
+        
+        const body = document.createElement('div');
+        body.className = 'card-body';
+        
+        const dateTag = document.createElement('span');
+        dateTag.style.fontSize = '12px';
+        dateTag.style.color = 'var(--gold)';
+        dateTag.style.fontWeight = '600';
+        dateTag.innerText = post.date;
+        
+        const title = document.createElement('h3');
+        title.style.marginTop = '6px';
+        title.innerText = post.title;
+        
+        const desc = document.createElement('p');
+        desc.style.marginTop = '10px';
+        desc.innerText = post.content;
+        
+        body.appendChild(dateTag);
+        body.appendChild(title);
+        body.appendChild(desc);
+        card.appendChild(img);
+        card.appendChild(body);
+        announcementsGrid.appendChild(card);
+      });
+      triggerAnimationsReveal();
+    } else {
+      announcementsSection.style.display = 'none';
+    }
+  });
+}
+
+function renderEventsUI() {
+  const eventHeroesSection = document.getElementById('event-heroes');
+  const eventHeroGrid = document.getElementById('eventHeroGrid');
+  if (!eventHeroesSection || !eventHeroGrid) return;
+
+  getEventHeroesList().then(heroes => {
+    if (heroes.length > 0) {
+      eventHeroesSection.style.display = 'block';
+      eventHeroGrid.innerHTML = '';
+      
+      heroes.forEach(eh => {
+        const card = document.createElement('div');
+        card.className = 'card reveal';
+        
+        const img = document.createElement('img');
+        img.src = 'logo.jpeg';
+        img.alt = eh.title;
+        img.style.width = '100%';
+        img.style.height = '220px';
+        img.style.objectFit = 'cover';
+        img.style.display = 'block';
+        img.style.borderBottom = '4px solid var(--gold)';
+        
+        resolveMediaSrc(img, eh.image);
+        
+        const body = document.createElement('div');
+        body.className = 'card-body';
+        
+        const badge = document.createElement('span');
+        badge.className = 'event-hero-badge';
+        badge.innerText = eh.date || 'Featured';
+        
+        const title = document.createElement('h3');
+        title.innerText = eh.title;
+        
+        const desc = document.createElement('p');
+        desc.style.marginTop = '8px';
+        desc.innerText = eh.description;
+        
+        body.appendChild(badge);
+        body.appendChild(title);
+        body.appendChild(desc);
+        card.appendChild(img);
+        card.appendChild(body);
+        eventHeroGrid.appendChild(card);
+      });
+      triggerAnimationsReveal();
+    } else {
+      eventHeroesSection.style.display = 'none';
+    }
+  });
+}
+
+function renderGalleryUI() {
   const dynamicGallery = document.getElementById('dynamicGallery');
   const btnLoadMore = document.getElementById('btnLoadMore');
   const paginationContainer = document.getElementById('galleryPagination');
-  
-  if (dynamicGallery && btnLoadMore) {
+  if (!dynamicGallery) return;
+
+  getGalleryPhotosList().then(galleryImages => {
     const BATCH_SIZE = 15;
     let currentIndex = 0;
 
@@ -219,9 +625,11 @@ document.addEventListener('DOMContentLoaded', () => {
         imgWrap.className = 'dynamic-gallery-item';
 
         const img = document.createElement('img');
-        img.src = src;
+        img.src = 'logo.jpeg';
         img.alt = "IPPAD Event Photo";
         img.loading = "lazy";
+        
+        resolveMediaSrc(img, src);
 
         imgWrap.appendChild(img);
         dynamicGallery.appendChild(imgWrap);
@@ -229,30 +637,129 @@ document.addEventListener('DOMContentLoaded', () => {
 
       currentIndex += BATCH_SIZE;
 
-      // Hide button if no more images
-      if (currentIndex >= galleryImages.length) {
-        paginationContainer.style.display = 'none';
+      if (btnLoadMore && paginationContainer) {
+        if (currentIndex >= galleryImages.length) {
+          paginationContainer.style.display = 'none';
+        } else {
+          paginationContainer.style.display = 'flex';
+        }
       }
+      triggerAnimationsReveal();
     }
 
-    // Initial Load
     dynamicGallery.innerHTML = '';
-    renderBatch();
+    if (galleryImages.length > 0) {
+      renderBatch();
+    } else {
+      dynamicGallery.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-light); padding: 40px 0;">No photos in the gallery currently.</p>';
+      if (paginationContainer) paginationContainer.style.display = 'none';
+    }
 
-    // Load More Event
-    btnLoadMore.addEventListener('click', () => {
-      btnLoadMore.innerText = "Loading...";
-      btnLoadMore.disabled = true;
-      
-      // Simulate a small delay for better UX
-      setTimeout(() => {
-        renderBatch();
-        btnLoadMore.innerText = "Load More Photos";
-        btnLoadMore.disabled = false;
+    if (btnLoadMore) {
+      // Recreate event listener to prevent duplicate attachment
+      const newBtn = btnLoadMore.cloneNode(true);
+      btnLoadMore.parentNode.replaceChild(newBtn, btnLoadMore);
+      newBtn.addEventListener('click', () => {
+        newBtn.innerText = "Loading...";
+        newBtn.disabled = true;
         
-        // Re-initialize Lucide if needed (though not used in items currently)
-        if (window.lucide) lucide.createIcons();
-      }, 400);
-    });
-  }
+        setTimeout(() => {
+          renderBatch();
+          newBtn.innerText = "Load More Photos";
+          newBtn.disabled = false;
+        }, 400);
+      });
+    }
+  });
+}
+
+function renderVideosUI() {
+  const videosSection = document.getElementById('videos');
+  const videoGrid = document.getElementById('videoGrid');
+  if (!videosSection || !videoGrid) return;
+
+  getVideosList().then(videos => {
+    if (videos.length > 0) {
+      videosSection.style.display = 'block';
+      videoGrid.innerHTML = '';
+      
+      videos.forEach(v => {
+        const card = document.createElement('div');
+        card.className = 'video-card reveal';
+        
+        const wrapper = document.createElement('div');
+        wrapper.className = 'video-wrapper';
+        
+        if (v.embedUrl.startsWith('http') || v.embedUrl.includes('embed')) {
+          const iframe = document.createElement('iframe');
+          iframe.src = v.embedUrl;
+          iframe.title = v.title;
+          iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+          iframe.allowFullscreen = true;
+          wrapper.appendChild(iframe);
+        } else {
+          const video = document.createElement('video');
+          video.controls = true;
+          video.style.width = '100%';
+          video.style.height = '100%';
+          video.style.position = 'absolute';
+          video.style.top = '0';
+          video.style.left = '0';
+          video.style.background = '#000';
+          wrapper.appendChild(video);
+          
+          resolveMediaSrc(video, v.embedUrl);
+        }
+        
+        const info = document.createElement('div');
+        info.className = 'video-info';
+        
+        const title = document.createElement('h4');
+        title.innerText = v.title;
+        
+        const desc = document.createElement('p');
+        desc.innerText = v.description;
+        
+        info.appendChild(title);
+        info.appendChild(desc);
+        
+        card.appendChild(wrapper);
+        card.appendChild(info);
+        videoGrid.appendChild(card);
+      });
+      triggerAnimationsReveal();
+    } else {
+      videosSection.style.display = 'none';
+    }
+  });
+}
+
+function triggerAnimationsReveal() {
+  const dynReveals = document.querySelectorAll('.reveal');
+  dynReveals.forEach(el => {
+    el.classList.add('reveal');
+    if (typeof revealObserver !== 'undefined') {
+      revealObserver.observe(el);
+    } else {
+      el.classList.add('active');
+    }
+  });
+  if (window.lucide) lucide.createIcons();
+}
+
+function initLiveUpdates() {
+  renderHeroUI();
+  renderPostsUI();
+  renderEventsUI();
+  renderGalleryUI();
+  renderVideosUI();
+}
+
+// Invoke initialization
+initSystemData();
+
+// Populate Gallery, Videos, Posts and text
+document.addEventListener('DOMContentLoaded', () => {
+  initLiveUpdates();
 });
+

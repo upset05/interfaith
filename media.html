@@ -25,6 +25,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="style.css">
 <script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 </head>
 <body>
 
@@ -293,6 +294,16 @@
     </div>
   </div>
 
+  <!-- FEATURED EVENT HERO PHOTOS -->
+  <div class="section" id="event-heroes" style="background:var(--white);border-top:1px solid var(--border); display: none;">
+    <div class="section-label">Featured Highlights</div>
+    <h2 class="section-title">Event <em>Hero Photos</em></h2>
+    <p class="section-sub">Highlighting key moments and milestone events in our journey of peace and development.</p>
+    <div class="card-grid" id="eventHeroGrid">
+      <!-- Event Hero Photos will be dynamically injected here -->
+    </div>
+  </div>
+
   <!-- GALLERY -->
   <div class="section" id="gallery" style="background:var(--grey);border-top:1px solid var(--border);">
     <div class="section-label">Photo Gallery</div>
@@ -303,6 +314,16 @@
     </div>
     <div id="galleryPagination" style="text-align:center; margin-top:48px;">
       <button id="btnLoadMore" class="btn-gold">Load More Photos</button>
+    </div>
+  </div>
+
+  <!-- VIDEOS -->
+  <div class="section" id="videos" style="background:var(--white);border-top:1px solid var(--border); display: none;">
+    <div class="section-label">Videos</div>
+    <h2 class="section-title">Video <em>Library</em></h2>
+    <p class="section-sub">Watch our peacebuilding activities, summit highlights, and dialogues in action.</p>
+    <div class="video-grid" id="videoGrid">
+      <!-- Videos injected dynamically -->
     </div>
   </div>
 
@@ -364,7 +385,10 @@
   </div>
   <div class="footer-bottom">
     <span>© 2025 IPPAD — Imams &amp; Pastors Interfaith Forum for Peace and Development. All rights reserved.</span>
-    <span style="color:rgba(255,255,255,.4);">interfaithlink.org</span>
+    <span>
+      <a href="admin.html" style="color: rgba(255,255,255,.4); text-decoration: none; margin-right: 15px;" onmouseover="this.style.color='#c9a227'" onmouseout="this.style.color='rgba(255,255,255,.4)'">Admin Portal</a>
+      <span style="color:rgba(255,255,255,.4);">interfaithlink.org</span>
+    </span>
   </div>
 </footer>
 

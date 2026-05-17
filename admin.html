@@ -1,0 +1,2010 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>IPPAD Admin Portal — Manage Content</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet"/>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+:root {
+  --green: #1a5c38;
+  --green-light: #2d7a4f;
+  --green-soft: #e8f4ed;
+  --blue: #1b3f6e;
+  --blue-light: #2c5fa8;
+  --blue-soft: #e8eff9;
+  --gold: #c9a227;
+  --gold-light: #e8c84a;
+  --white: #fdfcf8;
+  --grey: #f5f4f0;
+  --text: #1a1a1a;
+  --text-light: #5a5a5a;
+  --border: #e0dbd0;
+  --radius: 12px;
+  --shadow: 0 8px 30px rgba(0,0,0,0.06);
+  --shadow-lg: 0 20px 40px rgba(0,0,0,0.12);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--grey);
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4 {
+  font-family: 'Playfair Display', serif;
+}
+
+/* LOGIN PANEL */
+.login-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(26,92,56,0.95) 0%, rgba(27,63,110,0.95) 100%), url('WhatsApp Image 2026-05-07 at 1.27.03 PM.jpeg') center/cover;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.login-card {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 440px;
+  padding: 40px;
+  box-shadow: var(--shadow-lg);
+  text-align: center;
+  animation: floatIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+@keyframes floatIn {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.login-logo {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  margin: 0 auto 24px;
+  border: 4px solid var(--gold);
+  box-shadow: 0 8px 24px rgba(201,162,39,0.3);
+  object-fit: cover;
+}
+
+.login-card h2 {
+  font-size: 28px;
+  color: var(--green);
+  margin-bottom: 8px;
+}
+
+.login-card p {
+  font-size: 14px;
+  color: var(--text-light);
+  margin-bottom: 32px;
+}
+
+.input-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.input-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--text);
+  letter-spacing: 0.02em;
+}
+
+.input-group input, .input-group textarea, .input-group select {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  background: white;
+  transition: all 0.3s;
+}
+
+.input-group input:focus, .input-group textarea:focus, .input-group select:focus {
+  outline: none;
+  border-color: var(--green);
+  box-shadow: 0 0 0 4px var(--green-soft);
+}
+
+.btn-submit {
+  width: 100%;
+  background: var(--green);
+  color: white;
+  border: none;
+  padding: 14px;
+  border-radius: 30px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 4px 12px rgba(26,92,56,0.2);
+}
+
+.btn-submit:hover {
+  background: var(--green-light);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(26,92,56,0.3);
+}
+
+.error-message {
+  color: #d93838;
+  font-size: 13px;
+  margin-top: 12px;
+  display: none;
+  font-weight: 600;
+}
+
+/* ADMIN HEADER */
+header {
+  background: linear-gradient(135deg, var(--green) 0%, var(--blue) 100%);
+  color: white;
+  padding: 30px 48px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.header-logo {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 2px solid var(--gold);
+}
+
+.header-title h1 {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.header-title p {
+  font-size: 13px;
+  color: rgba(255,255,255,0.7);
+}
+
+.header-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-secondary {
+  background: rgba(255,255,255,0.15);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.3);
+  padding: 10px 20px;
+  border-radius: 30px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-secondary:hover {
+  background: rgba(255,255,255,0.25);
+  transform: translateY(-2px);
+}
+
+.btn-danger-outline {
+  background: transparent;
+  color: #ff6b6b;
+  border: 1px solid rgba(255, 107, 107, 0.4);
+  padding: 10px 20px;
+  border-radius: 30px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-danger-outline:hover {
+  background: rgba(255, 107, 107, 0.1);
+  border-color: #ff6b6b;
+}
+
+/* MAIN LAYOUT */
+.admin-container {
+  max-width: 1320px;
+  margin: 40px auto;
+  padding: 0 24px;
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 40px;
+}
+
+/* SIDEBAR TABS */
+.admin-sidebar {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px 16px;
+  height: fit-content;
+  box-shadow: var(--shadow);
+}
+
+.sidebar-menu {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.menu-item {
+  width: 100%;
+  padding: 12px 18px;
+  border-radius: 8px;
+  background: transparent;
+  border: none;
+  text-align: left;
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-light);
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.menu-item i {
+  color: var(--text-light);
+  width: 18px;
+  height: 18px;
+  transition: color 0.3s;
+}
+
+.menu-item:hover {
+  background: var(--grey);
+  color: var(--text);
+}
+
+.menu-item.active {
+  background: var(--green-soft);
+  color: var(--green);
+  font-weight: 700;
+}
+
+.menu-item.active i {
+  color: var(--green);
+}
+
+/* MAIN CONTENT */
+.admin-content {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 40px;
+  box-shadow: var(--shadow);
+  min-height: 500px;
+}
+
+.tab-pane {
+  display: none;
+}
+
+.tab-pane.active {
+  display: block;
+}
+
+.section-header {
+  border-bottom: 2px solid var(--grey);
+  padding-bottom: 20px;
+  margin-bottom: 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.section-header h2 {
+  font-size: 26px;
+  color: var(--blue);
+}
+
+.section-header p {
+  font-size: 14px;
+  color: var(--text-light);
+  margin-top: 4px;
+}
+
+/* UTILITY BUTTONS */
+.btn-primary {
+  background: var(--green);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 30px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-primary:hover {
+  background: var(--green-light);
+  transform: translateY(-2px);
+}
+
+.btn-danger {
+  background: #d93838;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 30px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-danger:hover {
+  background: #ff5252;
+}
+
+/* LIST CARDS FOR ITEMS */
+.item-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  margin-top: 24px;
+}
+
+.item-row {
+  display: flex;
+  gap: 24px;
+  padding: 20px;
+  background: var(--grey);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  align-items: center;
+  transition: all 0.3s;
+}
+
+.item-row:hover {
+  border-color: var(--green);
+  background: white;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+}
+
+.item-preview {
+  width: 110px;
+  height: 80px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+  background: #ddd;
+}
+
+.item-video-preview {
+  width: 110px;
+  height: 80px;
+  border-radius: 8px;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.item-details {
+  flex-grow: 1;
+}
+
+.item-details h4 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 16.5px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: var(--text);
+}
+
+.item-details p {
+  font-size: 13.5px;
+  color: var(--text-light);
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.item-details .badge {
+  display: inline-block;
+  background: var(--gold-light);
+  color: #111;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-top: 6px;
+  text-transform: uppercase;
+}
+
+/* MOCK FILE PICKER GRID */
+.picker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 12px;
+  max-height: 320px;
+  overflow-y: auto;
+  padding: 12px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  background: white;
+  margin-top: 8px;
+}
+
+.picker-item {
+  aspect-ratio: 4/3;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  background: #eee;
+}
+
+.picker-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.picker-item.selected {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px var(--green-soft);
+}
+
+.picker-item.selected::after {
+  content: '✓';
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: var(--green);
+  color: white;
+  font-size: 10px;
+  font-weight: bold;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* MODAL FORM styles */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+
+.modal-backdrop.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-box {
+  background: white;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 580px;
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  transform: translateY(30px);
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.modal-backdrop.show .modal-box {
+  transform: translateY(0);
+}
+
+.modal-header {
+  background: var(--green);
+  color: white;
+  padding: 20px 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h3 {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.modal-close {
+  background: transparent;
+  border: none;
+  color: rgba(255,255,255,0.7);
+  font-size: 24px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.modal-close:hover {
+  color: white;
+}
+
+.modal-body {
+  padding: 28px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.modal-footer {
+  padding: 16px 28px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  background: var(--grey);
+}
+
+/* SUCCESS TOAST ALERT */
+.toast {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background: #1a5c38;
+  color: white;
+  padding: 16px 24px;
+  border-radius: 8px;
+  box-shadow: var(--shadow-lg);
+  z-index: 10000;
+  transform: translateY(100px);
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+  font-size: 14.5px;
+}
+
+.toast.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* RESPONSIVE DESIGN */
+@media(max-width: 992px) {
+  .admin-container {
+    grid-template-columns: 1fr;
+  }
+  header {
+    padding: 24px;
+  }
+}
+@media(max-width: 600px) {
+  header {
+    flex-direction: column;
+    gap: 16px;
+    text-align: center;
+  }
+  .admin-content {
+    padding: 20px;
+  }
+  .item-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .item-row .btn-danger {
+    width: 100%;
+    justify-content: center;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN OVERLAY -->
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-card">
+    <img src="logo.jpeg" alt="IPPAD Logo" class="login-logo"/>
+    <h2>IPPAD Admin Portal</h2>
+    <p>Please enter the administrative password to manage the website content.</p>
+    <form id="loginForm" onsubmit="handleLogin(event)">
+      <div class="input-group">
+        <label for="password">Security Password</label>
+        <input type="password" id="password" placeholder="Enter password..." required autofocus autocomplete="current-password"/>
+      </div>
+      <button type="submit" class="btn-submit">Authenticate Portal</button>
+      <div class="error-message" id="errorMessage">Invalid security passcode. Hint: ippad2026</div>
+    </form>
+  </div>
+</div>
+
+<!-- MAIN ADMIN INTERFACE -->
+<header>
+  <div class="header-brand">
+    <img src="logo.jpeg" alt="IPPAD Logo" class="header-logo"/>
+    <div class="header-title">
+      <h1>IPPAD Content Engine</h1>
+      <p>Imams & Pastors Interfaith Forum for Peace and Development</p>
+    </div>
+  </div>
+  <div class="header-actions">
+    <a href="index.html" class="btn-secondary" target="_blank"><i data-lucide="external-link"></i> Live Website</a>
+    <button onclick="handleLogout()" class="btn-danger-outline">Lock Portal</button>
+  </div>
+</header>
+
+<div class="admin-container">
+  <!-- SIDEBAR MENU -->
+  <aside class="admin-sidebar">
+    <ul class="sidebar-menu">
+      <li>
+        <button class="menu-item active" onclick="switchTab('tab-hero', this)">
+          <i data-lucide="layout-template"></i> Home Hero & Header
+        </button>
+      </li>
+      <li>
+        <button class="menu-item" onclick="switchTab('tab-posts', this)">
+          <i data-lucide="megaphone"></i> News & Announcements
+        </button>
+      </li>
+      <li>
+        <button class="menu-item" onclick="switchTab('tab-events', this)">
+          <i data-lucide="sparkles"></i> Event Hero Photos
+        </button>
+      </li>
+      <li>
+        <button class="menu-item" onclick="switchTab('tab-gallery', this)">
+          <i data-lucide="image"></i> Main Gallery Photos
+        </button>
+      </li>
+      <li>
+        <button class="menu-item" onclick="switchTab('tab-videos', this)">
+          <i data-lucide="video"></i> Video Library
+        </button>
+      </li>
+      <li style="margin-top: 24px; border-top: 1px solid var(--border); padding-top: 16px;">
+        <button class="menu-item" onclick="resetDefaults()" style="color: #d93838;">
+          <i data-lucide="refresh-cw" style="color: #d93838;"></i> Reset All Defaults
+        </button>
+      </li>
+    </ul>
+  </aside>
+
+  <!-- CONTENT ENGINE -->
+  <main class="admin-content">
+    
+    <!-- TAB 1: HOME HERO -->
+    <div class="tab-pane active" id="tab-hero">
+      <div class="section-header">
+        <div>
+          <h2>Home Hero &amp; Motto</h2>
+          <p>Update homepage presentation title, descriptions, motto badge and background hero picture.</p>
+        </div>
+      </div>
+      <form id="heroForm" onsubmit="saveHeroContent(event)">
+        <div class="input-group">
+          <label for="hero_badge">Motto Badge (Top Ribbon)</label>
+          <input type="text" id="hero_badge" required/>
+        </div>
+        <div class="input-group">
+          <label for="hero_title">Hero Heading (Use &lt;em&gt; tags for green highlights, &lt;br/&gt; for linebreaks)</label>
+          <input type="text" id="hero_title" required/>
+        </div>
+        <div class="input-group">
+          <label for="hero_motto">Secondary Motto (Underneath Heading)</label>
+          <input type="text" id="hero_motto" required/>
+        </div>
+        <div class="input-group">
+          <label for="hero_desc">Hero Description Paragraph</label>
+          <textarea id="hero_desc" rows="4" required></textarea>
+        </div>
+        <div class="input-group">
+          <label>Select Background Hero Photo</label>
+          <p style="font-size: 12px; color: var(--text-light); margin-bottom: 8px;">Choose from existing local project pictures below, or paste a custom web URL.</p>
+          <input type="text" id="hero_photo_url" placeholder="Custom image file or absolute web URL..." style="margin-bottom: 12px;"/>
+          
+          <div class="input-group" style="background: var(--grey); padding: 16px; border-radius: var(--radius); border: 1.5px dashed var(--border); margin-top: 12px; margin-bottom: 16px;">
+            <label style="display: flex; align-items: center; gap: 8px; color: var(--green); font-weight: 600;">
+              <i data-lucide="upload-cloud"></i> Or Upload From Device / Gallery
+            </label>
+            <input type="file" accept="image/*" onchange="handleFileUpload(event, 'hero_photo_url')" style="margin-top: 8px; border: none; padding: 0; background: transparent;"/>
+            <p style="font-size: 11px; color: var(--text-light); margin-top: 6px; line-height: 1.4;">
+              <strong>GitHub Commits:</strong> Place this file named exactly <code id="hero_file_label" style="background:#e0dbd0; padding:2px 4px; border-radius:4px; font-weight:bold;">(waiting for file...)</code> into your project folder so it commits correctly.
+            </p>
+          </div>
+          
+          <div class="picker-grid" id="heroPickerGrid">
+            <!-- Local project images injected here -->
+          </div>
+        </div>
+        
+        <button type="submit" class="btn-primary" style="margin-top: 24px;"><i data-lucide="save"></i> Save Hero Changes</button>
+      </form>
+    </div>
+
+    <!-- TAB 2: NEWS & ANNOUNCEMENTS -->
+    <div class="tab-pane" id="tab-posts">
+      <div class="section-header">
+        <div>
+          <h2>News &amp; Announcements</h2>
+          <p>Add announcements, press releases, and publications that will show up on the index homepage news card grid.</p>
+        </div>
+        <button onclick="openModal('modalPost')" class="btn-primary"><i data-lucide="plus-circle"></i> Add Announcement</button>
+      </div>
+      <div class="item-list" id="postsList">
+        <!-- Announcements list dynamically injected -->
+      </div>
+    </div>
+
+    <!-- TAB 3: EVENT HERO PHOTOS -->
+    <div class="tab-pane" id="tab-events">
+      <div class="section-header">
+        <div>
+          <h2>Featured Event Hero Photos</h2>
+          <p>Add large highlight event cards that are shown at the top of the Media & Resources page.</p>
+        </div>
+        <button onclick="openModal('modalEvent')" class="btn-primary"><i data-lucide="plus-circle"></i> Add Event Hero</button>
+      </div>
+      <div class="item-list" id="eventsList">
+        <!-- Event heroes dynamically injected -->
+      </div>
+    </div>
+
+    <!-- TAB 4: GALLERY PHOTOS -->
+    <div class="tab-pane" id="tab-gallery">
+      <div class="section-header">
+        <div>
+          <h2>Main Gallery Photos ("Every Other Photo")</h2>
+          <p>Manage the large masonry image gallery displaying moments of community, trauma healing, and interfaith work.</p>
+        </div>
+        <button onclick="openModal('modalGallery')" class="btn-primary"><i data-lucide="plus-circle"></i> Add Photo to Gallery</button>
+      </div>
+      <div class="item-list" id="galleryList" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;">
+        <!-- Photos injected here -->
+      </div>
+    </div>
+
+    <!-- TAB 5: VIDEO LIBRARY -->
+    <div class="tab-pane" id="tab-videos">
+      <div class="section-header">
+        <div>
+          <h2>Video Library</h2>
+          <p>Add, edit, or delete YouTube or Vimeo videos showcasing the summit highlights and field interviews.</p>
+        </div>
+        <button onclick="openModal('modalVideo')" class="btn-primary"><i data-lucide="plus-circle"></i> Add Video</button>
+      </div>
+      <div class="item-list" id="videosList">
+        <!-- Videos list injected here -->
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ================= MODALS ================= -->
+
+<!-- ADD ANNOUNCEMENT MODAL -->
+<div class="modal-backdrop" id="modalPost">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>New Announcement</h3>
+      <button class="modal-close" onclick="closeModal('modalPost')">&times;</button>
+    </div>
+    <form onsubmit="handleAddPost(event)">
+      <div class="modal-body">
+        <div class="input-group">
+          <label for="post_title">Title</label>
+          <input type="text" id="post_title" required placeholder="e.g. Dialogue Summit Zaria 2026"/>
+        </div>
+        <div class="input-group">
+          <label for="post_date">Date / Date Range</label>
+          <input type="text" id="post_date" required placeholder="e.g. May 14, 2026 or April 2026"/>
+        </div>
+        <div class="input-group">
+          <label for="post_content">Announcement Paragraph Content</label>
+          <textarea id="post_content" rows="4" required placeholder="Describe the announcement..."></textarea>
+        </div>
+        <div class="input-group">
+          <label>Featured Image Selection</label>
+          <input type="text" id="post_image_url" placeholder="Custom photo file or URL..."/>
+          
+          <div class="input-group" style="background: var(--grey); padding: 16px; border-radius: var(--radius); border: 1.5px dashed var(--border); margin-top: 12px; margin-bottom: 16px;">
+            <label style="display: flex; align-items: center; gap: 8px; color: var(--green); font-weight: 600;">
+              <i data-lucide="upload-cloud"></i> Or Upload From Device / Gallery
+            </label>
+            <input type="file" accept="image/*" onchange="handleFileUpload(event, 'post_image_url')" style="margin-top: 8px; border: none; padding: 0; background: transparent;"/>
+            <p style="font-size: 11px; color: var(--text-light); margin-top: 6px; line-height: 1.4;">
+              <strong>GitHub Commits:</strong> Place this file named exactly <code id="post_file_label" style="background:#e0dbd0; padding:2px 4px; border-radius:4px; font-weight:bold;">(waiting for file...)</code> into your project folder so it commits correctly.
+            </p>
+          </div>
+          
+          <div class="picker-grid" id="postPickerGrid">
+            <!-- Project images injected here -->
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" onclick="closeModal('modalPost')">Cancel</button>
+        <button type="submit" class="btn-primary">Add Announcement</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ADD EVENT HERO MODAL -->
+<div class="modal-backdrop" id="modalEvent">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>New Featured Event Hero Photo</h3>
+      <button class="modal-close" onclick="closeModal('modalEvent')">&times;</button>
+    </div>
+    <form onsubmit="handleAddEvent(event)">
+      <div class="modal-body">
+        <div class="input-group">
+          <label for="event_title">Event Title</label>
+          <input type="text" id="event_title" required placeholder="e.g. Women of Faith Empowerment Rally"/>
+        </div>
+        <div class="input-group">
+          <label for="event_date">Month &amp; Year / Date</label>
+          <input type="text" id="event_date" required placeholder="e.g. June 2026"/>
+        </div>
+        <div class="input-group">
+          <label for="event_desc">Highlight Description</label>
+          <textarea id="event_desc" rows="3" required placeholder="Briefly capture the event..."></textarea>
+        </div>
+        <div class="input-group">
+          <label>Select Event Image</label>
+          <input type="text" id="event_image_url" placeholder="Custom picture file or web URL..."/>
+          
+          <div class="input-group" style="background: var(--grey); padding: 16px; border-radius: var(--radius); border: 1.5px dashed var(--border); margin-top: 12px; margin-bottom: 16px;">
+            <label style="display: flex; align-items: center; gap: 8px; color: var(--green); font-weight: 600;">
+              <i data-lucide="upload-cloud"></i> Or Upload From Device / Gallery
+            </label>
+            <input type="file" accept="image/*" onchange="handleFileUpload(event, 'event_image_url')" style="margin-top: 8px; border: none; padding: 0; background: transparent;"/>
+            <p style="font-size: 11px; color: var(--text-light); margin-top: 6px; line-height: 1.4;">
+              <strong>GitHub Commits:</strong> Place this file named exactly <code id="event_file_label" style="background:#e0dbd0; padding:2px 4px; border-radius:4px; font-weight:bold;">(waiting for file...)</code> into your project folder so it commits correctly.
+            </p>
+          </div>
+          
+          <div class="picker-grid" id="eventPickerGrid">
+            <!-- Project images injected here -->
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" onclick="closeModal('modalEvent')">Cancel</button>
+        <button type="submit" class="btn-primary">Add Event Hero</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ADD GALLERY PHOTO MODAL -->
+<div class="modal-backdrop" id="modalGallery">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>Add Photo to Gallery</h3>
+      <button class="modal-close" onclick="closeModal('modalGallery')">&times;</button>
+    </div>
+    <form onsubmit="handleAddGallery(event)">
+      <div class="modal-body">
+        <div class="input-group">
+          <label>Choose Photo</label>
+          <input type="text" id="gallery_image_url" required placeholder="Select file below or paste web image link..."/>
+          
+          <div class="input-group" style="background: var(--grey); padding: 16px; border-radius: var(--radius); border: 1.5px dashed var(--border); margin-top: 12px; margin-bottom: 16px;">
+            <label style="display: flex; align-items: center; gap: 8px; color: var(--green); font-weight: 600;">
+              <i data-lucide="upload-cloud"></i> Or Upload From Device / Gallery
+            </label>
+            <input type="file" accept="image/*" onchange="handleFileUpload(event, 'gallery_image_url')" style="margin-top: 8px; border: none; padding: 0; background: transparent;"/>
+            <p style="font-size: 11px; color: var(--text-light); margin-top: 6px; line-height: 1.4;">
+              <strong>GitHub Commits:</strong> Place this file named exactly <code id="gallery_file_label" style="background:#e0dbd0; padding:2px 4px; border-radius:4px; font-weight:bold;">(waiting for file...)</code> into your project folder so it commits correctly.
+            </p>
+          </div>
+          
+          <div class="picker-grid" id="galleryPickerGrid">
+            <!-- Project images injected here -->
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" onclick="closeModal('modalGallery')">Cancel</button>
+        <button type="submit" class="btn-primary">Add to Gallery</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ADD VIDEO MODAL -->
+<div class="modal-backdrop" id="modalVideo">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>Add Video to Library</h3>
+      <button class="modal-close" onclick="closeModal('modalVideo')">&times;</button>
+    </div>
+    <form onsubmit="handleAddVideo(event)">
+      <div class="modal-body">
+        <div class="input-group">
+          <label for="video_title">Video Title</label>
+          <input type="text" id="video_title" required placeholder="e.g. Field Report: Joint Farm Cooperative"/>
+        </div>
+        <div class="input-group">
+          <label for="video_desc">Short Description</label>
+          <textarea id="video_desc" rows="3" required placeholder="Brief description..."></textarea>
+        </div>
+        <div class="input-group">
+          <label for="video_url">YouTube Embed URL or Standard YouTube Link</label>
+          <input type="text" id="video_url" required placeholder="e.g. https://www.youtube.com/embed/xxxxxx or standard youtube link"/>
+          
+          <div class="input-group" style="background: var(--grey); padding: 16px; border-radius: var(--radius); border: 1.5px dashed var(--border); margin-top: 12px; margin-bottom: 16px;">
+            <label style="display: flex; align-items: center; gap: 8px; color: var(--green); font-weight: 600;">
+              <i data-lucide="upload-cloud"></i> Or Upload Video File From Device
+            </label>
+            <input type="file" accept="video/*" onchange="handleFileUpload(event, 'video_url')" style="margin-top: 8px; border: none; padding: 0; background: transparent;"/>
+            <p style="font-size: 11px; color: var(--text-light); margin-top: 6px; line-height: 1.4;">
+              <strong>GitHub Commits:</strong> Place this video named exactly <code id="video_file_label" style="background:#e0dbd0; padding:2px 4px; border-radius:4px; font-weight:bold;">(waiting for file...)</code> into your project folder so it commits correctly.
+            </p>
+          </div>
+          <p style="font-size: 11px; color: var(--text-light); margin-top: 4px;">Make sure to use YouTube's embed link format: <code>https://www.youtube.com/embed/VIDEO_ID</code>. Standard YouTube URLs will automatically be reformatted into embed links.</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" onclick="closeModal('modalVideo')">Cancel</button>
+        <button type="submit" class="btn-primary">Add Video</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- SUCCESS TOAST -->
+<div class="toast" id="toastBox">
+  <i data-lucide="check-circle-2"></i> <span id="toastText">Changes saved successfully!</span>
+</div>
+
+<script>
+// Array of local pictures extracted from project
+const projectImages = [
+  "WhatsApp Image 2026-05-01 at 5.53.05 PM (1).jpeg",
+  "WhatsApp Image 2026-05-01 at 5.53.05 PM.jpeg",
+  "WhatsApp Image 2026-05-04 at 1.56.34 PM.jpeg",
+  "WhatsApp Image 2026-05-04 at 1.56.35 PM.jpeg",
+  "WhatsApp Image 2026-05-04 at 1.56.36 PM.jpeg",
+  "WhatsApp Image 2026-05-04 at 1.56.37 PM.jpeg",
+  "WhatsApp Image 2026-05-04 at 1.56.38 PM.jpeg",
+  "WhatsApp Image 2026-05-04 at 1.56.39 PM.jpeg",
+  "WhatsApp Image 2026-05-04 at 1.56.40 PM.jpeg",
+  "WhatsApp Image 2026-05-04 at 1.56.41 PM.jpeg",
+  "WhatsApp Image 2026-05-04 at 1.56.43 PM (1).jpeg",
+  "WhatsApp Image 2026-05-04 at 1.56.44 PM.jpeg",
+  "WhatsApp Image 2026-05-04 at 1.56.45 PM (1).jpeg",
+  "WhatsApp Image 2026-05-04 at 1.56.47 PM (1).jpeg",
+  "WhatsApp Image 2026-05-04 at 1.56.48 PM.jpeg",
+  "WhatsApp Image 2026-05-04 at 1.56.50 PM (1).jpeg",
+  "WhatsApp Image 2026-05-04 at 1.56.50 PM.jpeg",
+  "WhatsApp Image 2026-05-04 at 1.56.51 PM.jpeg",
+  "WhatsApp Image 2026-05-04 at 1.56.53 PM.jpeg",
+  "WhatsApp Image 2026-05-04 at 1.56.54 PM.jpeg",
+  "WhatsApp Image 2026-05-04 at 1.56.56 PM.jpeg",
+  "WhatsApp Image 2026-05-04 at 1.56.57 PM.jpeg",
+  "WhatsApp Image 2026-05-04 at 1.57.00 PM.jpeg",
+  "WhatsApp Image 2026-05-04 at 1.57.01 PM.jpeg",
+  "WhatsApp Image 2026-05-04 at 1.57.03 PM (1).jpeg",
+  "WhatsApp Image 2026-05-04 at 1.57.03 PM (3).jpeg",
+  "WhatsApp Image 2026-05-04 at 1.57.04 PM (1).jpeg",
+  "WhatsApp Image 2026-05-04 at 1.57.04 PM (2).jpeg",
+  "WhatsApp Image 2026-05-04 at 1.57.04 PM.jpeg",
+  "WhatsApp Image 2026-05-04 at 1.57.05 PM (1).jpeg",
+  "WhatsApp Image 2026-05-04 at 1.57.05 PM (2).jpeg",
+  "WhatsApp Image 2026-05-04 at 1.57.05 PM (3).jpeg",
+  "WhatsApp Image 2026-05-04 at 1.57.05 PM.jpeg",
+  "WhatsApp Image 2026-05-04 at 1.57.06 PM.jpeg",
+  "WhatsApp Image 2026-05-04 at 1.57.07 PM (1).jpeg",
+  "WhatsApp Image 2026-05-04 at 1.57.07 PM (2).jpeg",
+  "WhatsApp Image 2026-05-04 at 1.57.08 PM.jpeg",
+  "WhatsApp Image 2026-05-04 at 1.57.09 PM.jpeg",
+  "WhatsApp Image 2026-05-04 at 1.57.10 PM.jpeg",
+  "WhatsApp Image 2026-05-04 at 1.57.12 PM.jpeg",
+  "WhatsApp Image 2026-05-04 at 1.57.14 PM (1).jpeg",
+  "WhatsApp Image 2026-05-04 at 1.57.14 PM (2).jpeg",
+  "WhatsApp Image 2026-05-04 at 1.57.14 PM.jpeg",
+  "WhatsApp Image 2026-05-04 at 1.57.16 PM (1).jpeg",
+  "WhatsApp Image 2026-05-04 at 1.57.16 PM.jpeg",
+  "WhatsApp Image 2026-05-04 at 1.57.17 PM (1).jpeg",
+  "WhatsApp Image 2026-05-04 at 1.57.17 PM (2).jpeg",
+  "WhatsApp Image 2026-05-04 at 1.57.17 PM.jpeg",
+  "WhatsApp Image 2026-05-04 at 1.57.18 PM (1).jpeg",
+  "WhatsApp Image 2026-05-04 at 1.57.18 PM.jpeg",
+  "WhatsApp Image 2026-05-04 at 1.57.19 PM (1).jpeg",
+  "WhatsApp Image 2026-05-04 at 1.57.20 PM.jpeg",
+  "WhatsApp Image 2026-05-04 at 1.57.21 PM (1).jpeg",
+  "WhatsApp Image 2026-05-04 at 1.57.21 PM.jpeg",
+  "WhatsApp Image 2026-05-04 at 1.57.22 PM.jpeg",
+  "WhatsApp Image 2026-05-04 at 1.57.23 PM (1).jpeg",
+  "WhatsApp Image 2026-05-04 at 1.57.23 PM (2).jpeg",
+  "WhatsApp Image 2026-05-04 at 1.57.23 PM.jpeg",
+  "WhatsApp Image 2026-05-04 at 1.57.25 PM.jpeg",
+  "WhatsApp Image 2026-05-04 at 1.57.26 PM (1).jpeg",
+  "WhatsApp Image 2026-05-04 at 1.57.26 PM (2).jpeg",
+  "WhatsApp Image 2026-05-04 at 1.57.26 PM.jpeg",
+  "WhatsApp Image 2026-05-04 at 1.57.27 PM (1).jpeg",
+  "WhatsApp Image 2026-05-04 at 1.57.27 PM (2).jpeg",
+  "WhatsApp Image 2026-05-04 at 1.57.27 PM (3).jpeg",
+  "WhatsApp Image 2026-05-04 at 1.57.27 PM.jpeg",
+  "WhatsApp Image 2026-05-04 at 1.57.28 PM (1).jpeg",
+  "WhatsApp Image 2026-05-04 at 1.57.28 PM (2).jpeg",
+  "WhatsApp Image 2026-05-04 at 1.57.29 PM (1).jpeg",
+  "WhatsApp Image 2026-05-04 at 1.57.29 PM (2).jpeg",
+  "WhatsApp Image 2026-05-04 at 1.57.29 PM.jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.03 PM (1).jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.03 PM (2).jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.03 PM.jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.04 PM (1).jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.04 PM (2).jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.04 PM (3).jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.04 PM.jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.05 PM (1).jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.05 PM (2).jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.05 PM.jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.06 PM.jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.09 PM (1).jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.09 PM.jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.10 PM (1).jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.10 PM (2).jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.10 PM.jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.11 PM (1).jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.11 PM (2).jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.11 PM.jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.12 PM (1).jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.12 PM (2).jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.12 PM.jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.13 PM (1).jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.13 PM (2).jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.13 PM.jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.15 PM.jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.16 PM (1).jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.16 PM (2).jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.16 PM.jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.17 PM (1).jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.17 PM (2).jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.17 PM.jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.18 PM (1).jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.18 PM.jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.21 PM.jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.22 PM.jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.23 PM.jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.24 PM (1).jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.24 PM.jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.25 PM (1).jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.25 PM (2).jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.25 PM.jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.26 PM (1).jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.26 PM (2).jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.26 PM.jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.27 PM.jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.29 PM (1).jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.29 PM.jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.30 PM (1).jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.30 PM.jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.31 PM (1).jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.31 PM.jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.32 PM.jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.33 PM.jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.34 PM.jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.35 PM (1).jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.35 PM.jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.36 PM.jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.55 PM.jpeg",
+  "WhatsApp Image 2026-05-07 at 1.27.56 PM.jpeg",
+  "WhatsApp Image 2026-05-07 at 1.28.01 PM.jpeg",
+  "WhatsApp Image 2026-05-07 at 1.28.02 PM (1).jpeg",
+  "WhatsApp Image 2026-05-07 at 1.28.02 PM (2).jpeg",
+  "WhatsApp Image 2026-05-07 at 1.28.02 PM.jpeg",
+  "WhatsApp Image 2026-05-07 at 1.28.03 PM (1).jpeg",
+  "WhatsApp Image 2026-05-07 at 1.28.03 PM (2).jpeg",
+  "WhatsApp Image 2026-05-07 at 1.28.03 PM.jpeg",
+  "WhatsApp Image 2026-05-07 at 1.28.04 PM (1).jpeg",
+  "WhatsApp Image 2026-05-07 at 1.28.04 PM (2).jpeg",
+  "WhatsApp Image 2026-05-07 at 1.28.04 PM.jpeg",
+  "WhatsApp Image 2026-05-07 at 1.28.05 PM (1).jpeg",
+  "WhatsApp Image 2026-05-07 at 1.28.05 PM.jpeg",
+  "WhatsApp Image 2026-05-07 at 1.28.06 PM (1).jpeg",
+  "WhatsApp Image 2026-05-07 at 1.28.06 PM.jpeg",
+  "WhatsApp Image 2026-05-07 at 1.28.07 PM (1).jpeg",
+  "WhatsApp Image 2026-05-07 at 1.28.07 PM.jpeg",
+  "WhatsApp Image 2026-05-07 at 1.28.08 PM.jpeg",
+  "WhatsApp Image 2026-05-07 at 1.28.10 PM (1).jpeg",
+  "WhatsApp Image 2026-05-07 at 1.28.10 PM.jpeg",
+  "WhatsApp Image 2026-05-07 at 1.28.15 PM.jpeg",
+  "WhatsApp Image 2026-05-07 at 1.28.16 PM (1).jpeg",
+  "WhatsApp Image 2026-05-07 at 1.28.16 PM.jpeg",
+  "WhatsApp Image 2026-05-07 at 1.28.17 PM (1).jpeg",
+  "WhatsApp Image 2026-05-07 at 1.28.17 PM.jpeg",
+  "WhatsApp Image 2026-05-07 at 1.28.18 PM (1).jpeg",
+  "WhatsApp Image 2026-05-07 at 1.28.18 PM.jpeg",
+  "WhatsApp Image 2026-05-07 at 1.28.19 PM (1).jpeg",
+  "WhatsApp Image 2026-05-07 at 1.28.19 PM.jpeg",
+  "WhatsApp Image 2026-05-07 at 1.28.20 PM (1).jpeg",
+  "WhatsApp Image 2026-05-07 at 1.28.20 PM.jpeg"
+];
+
+// --- CONFIGURATION CONSTANTS ---
+// Paste your Supabase project credentials here to go live globally!
+const SUPABASE_URL = "https://jdgzxvwgvmssayobbdrz.supabase.co"; 
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpkZ3p4dndndm1zc2F5b2JiZHJ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkwMTMxMDgsImV4cCI6MjA5NDU4OTEwOH0.2OydMDLfRXz5dT0lrHwk4SVOPJom4wC86FCXDJ5FLzQ";
+
+let supabase = null;
+
+// Initialize Supabase dynamically and wait for the library to be ready
+function initSupabase() {
+  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) return;
+  
+  const tryInit = () => {
+    const lib = window.supabase;
+    if (lib && typeof lib.createClient === 'function') {
+      try {
+        supabase = lib.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        console.log("Supabase Client initialized successfully!");
+        // Re-render UI with dynamic cloud values
+        renderAllContent();
+        loadHeroForm();
+      } catch (e) {
+        console.error("Failed to initialize Supabase client:", e);
+      }
+    } else {
+      // Retry in 50ms
+      setTimeout(tryInit, 50);
+    }
+  };
+  
+  tryInit();
+}
+
+initSupabase();
+
+// --- INDEXEDDB MEDIA CACHE ENGINE ---
+const DB_NAME = 'ippad_media_db';
+const DB_VERSION = 1;
+const STORE_NAME = 'media';
+
+function getDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, DB_VERSION);
+    request.onupgradeneeded = (e) => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains(STORE_NAME)) {
+        db.createObjectStore(STORE_NAME);
+      }
+    };
+    request.onsuccess = (e) => resolve(e.target.result);
+    request.onerror = (e) => reject(e.target.error);
+  });
+}
+
+// Save binary data locally in IndexedDB
+function saveMedia(key, file) {
+  return getDB().then(db => {
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction(STORE_NAME, 'readwrite');
+      const store = transaction.objectStore(STORE_NAME);
+      const request = store.put(file, key);
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+    });
+  });
+}
+
+// Get binary data from IndexedDB
+function getMedia(key) {
+  return getDB().then(db => {
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction(STORE_NAME, 'readonly');
+      const store = transaction.objectStore(STORE_NAME);
+      const request = store.get(key);
+      request.onsuccess = (e) => resolve(e.target.result);
+      request.onerror = (e) => reject(request.error);
+    });
+  });
+}
+
+function resolveMediaSrc(element, src, property = 'src') {
+  if (!src) return Promise.resolve(src);
+  if (src.startsWith('http://') || src.startsWith('https://') || src.startsWith('data:')) {
+    if (element) element[property] = src;
+    return Promise.resolve(src);
+  }
+  
+  // If Supabase is active, check if it's a file path to resolve from storage bucket
+  if (supabase) {
+    try {
+      const { data } = supabase.storage.from('images').getPublicUrl(src);
+      if (data && data.publicUrl) {
+        const publicUrl = data.publicUrl;
+        if (element) element[property] = publicUrl;
+        return Promise.resolve(publicUrl);
+      }
+    } catch (e) {
+      console.warn("Failed to get public URL from Supabase storage:", e);
+    }
+  }
+
+  return getMedia(src).then(file => {
+    if (file) {
+      const objectUrl = URL.createObjectURL(file);
+      if (element) {
+        element[property] = objectUrl;
+      }
+      return objectUrl;
+    }
+    if (element) element[property] = src;
+    return src;
+  }).catch(err => {
+    if (element) element[property] = src;
+    return src;
+  });
+}
+
+function handleFileUpload(event, inputId) {
+  const file = event.target.files[0];
+  if (!file) return;
+  
+  const filename = file.name;
+  
+  // If Supabase is active, upload to Supabase Storage Bucket!
+  if (supabase) {
+    showToast(`Uploading "${filename}" to Supabase Cloud Storage...`);
+    supabase.storage.from('images').upload(filename, file, {
+      cacheControl: '3600',
+      upsert: true
+    }).then(({ data, error }) => {
+      if (error) {
+        console.error("Supabase upload error:", error);
+        showToast("Cloud upload failed. Saving locally...");
+        saveLocalOnly(filename, file, inputId);
+      } else {
+        document.getElementById(inputId).value = filename;
+        updateFileLabel(inputId, filename);
+        showToast(`"${filename}" uploaded successfully to Supabase!`);
+        if (inputId === 'hero_photo_url') {
+          highlightPicker('heroPickerGrid', filename);
+        }
+      }
+    });
+  } else {
+    saveLocalOnly(filename, file, inputId);
+  }
+}
+
+function saveLocalOnly(filename, file, inputId) {
+  saveMedia(filename, file).then(() => {
+    document.getElementById(inputId).value = filename;
+    updateFileLabel(inputId, filename);
+    showToast(`"${filename}" uploaded locally! Remember to commit it for GitHub.`);
+    if (inputId === 'hero_photo_url') {
+      highlightPicker('heroPickerGrid', filename);
+    }
+  }).catch(err => {
+    console.error("Local save error:", err);
+    showToast("Upload failed.");
+  });
+}
+
+function updateFileLabel(inputId, filename) {
+  let labelId = '';
+  if (inputId === 'hero_photo_url') labelId = 'hero_file_label';
+  if (inputId === 'post_image_url') labelId = 'post_file_label';
+  if (inputId === 'event_image_url') labelId = 'event_file_label';
+  if (inputId === 'gallery_image_url') labelId = 'gallery_file_label';
+  if (inputId === 'video_url') labelId = 'video_file_label';
+  
+  if (labelId) {
+    const label = document.getElementById(labelId);
+    if (label) label.innerText = filename;
+  }
+}
+
+// --- AUTHENTICATION MODULE ---
+window.onload = function() {
+  if (sessionStorage.getItem('ippad_admin_logged_in') === 'true') {
+    document.getElementById('loginOverlay').style.display = 'none';
+  }
+  
+  // Render dropdown pickers and content lists
+  initPickers();
+  renderAllContent();
+  loadHeroForm();
+  
+  // Initialize Lucide icons
+  if (window.lucide) lucide.createIcons();
+};
+
+function handleLogin(event) {
+  event.preventDefault();
+  const pass = document.getElementById('password').value;
+  
+  if (pass === 'ippad2026') {
+    sessionStorage.setItem('ippad_admin_logged_in', 'true');
+    document.getElementById('loginOverlay').style.display = 'none';
+    showToast("Authentication successful! Welcome to IPPAD Portal.");
+  } else {
+    const errorMsg = document.getElementById('errorMessage');
+    errorMsg.style.display = 'block';
+    // Shake animation
+    const card = document.querySelector('.login-card');
+    card.style.animation = 'none';
+    card.offsetHeight; // trigger reflow
+    card.style.animation = 'shake 0.4s';
+    
+    // Add custom shake keyframes if not present
+    if (!document.getElementById('shake-style')) {
+      const style = document.createElement('style');
+      style.id = 'shake-style';
+      style.innerHTML = `
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          25% { transform: translateX(-10px); }
+          75% { transform: translateX(10px); }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+  }
+}
+
+function handleLogout() {
+  sessionStorage.removeItem('ippad_admin_logged_in');
+  document.getElementById('loginOverlay').style.display = 'flex';
+  document.getElementById('password').value = '';
+  document.getElementById('errorMessage').style.display = 'none';
+}
+
+// --- TAB ROUTER ---
+function switchTab(tabId, btn) {
+  document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+  document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
+  
+  document.getElementById(tabId).classList.add('active');
+  btn.classList.add('active');
+  
+  if (window.lucide) lucide.createIcons();
+}
+
+// --- MOCK IMAGE PICKER GENERATOR ---
+function initPickers() {
+  const grids = ['heroPickerGrid', 'postPickerGrid', 'eventPickerGrid', 'galleryPickerGrid'];
+  
+  grids.forEach(gridId => {
+    const grid = document.getElementById(gridId);
+    if (!grid) return;
+    
+    grid.innerHTML = '';
+    projectImages.forEach(imgName => {
+      const item = document.createElement('div');
+      item.className = 'picker-item';
+      item.dataset.src = imgName;
+      
+      const img = document.createElement('img');
+      img.src = imgName;
+      img.alt = imgName;
+      img.loading = "lazy";
+      
+      item.appendChild(img);
+      
+      item.addEventListener('click', () => {
+        // Unselect siblings
+        grid.querySelectorAll('.picker-item').forEach(sib => sib.classList.remove('selected'));
+        item.classList.add('selected');
+        
+        // Update input field
+        if (gridId === 'heroPickerGrid') document.getElementById('hero_photo_url').value = imgName;
+        if (gridId === 'postPickerGrid') document.getElementById('post_image_url').value = imgName;
+        if (gridId === 'eventPickerGrid') document.getElementById('event_image_url').value = imgName;
+        if (gridId === 'galleryPickerGrid') document.getElementById('gallery_image_url').value = imgName;
+      });
+      
+      grid.appendChild(item);
+    });
+  });
+}
+
+// Highlight picker item based on value
+function highlightPicker(gridId, filename) {
+  const grid = document.getElementById(gridId);
+  if (!grid) return;
+  
+  grid.querySelectorAll('.picker-item').forEach(item => {
+    if (item.dataset.src === filename) {
+      item.classList.add('selected');
+      item.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    } else {
+      item.classList.remove('selected');
+    }
+  });
+}
+
+// --- DATA ENGINE MAPPERS ---
+// --- DATA ENGINE MAPPERS ---
+function loadHeroForm() {
+  if (supabase) {
+    supabase.from('hero_content').select('*').eq('id', 'main_hero').single().then(({ data, error }) => {
+      if (data && !error) {
+        document.getElementById('hero_badge').value = data.badge;
+        document.getElementById('hero_title').value = data.title;
+        document.getElementById('hero_motto').value = data.motto;
+        document.getElementById('hero_desc').value = data.description;
+        document.getElementById('hero_photo_url').value = data.photo_url;
+        highlightPicker('heroPickerGrid', data.photo_url);
+      }
+    });
+    return;
+  }
+  document.getElementById('hero_badge').value = localStorage.getItem('ippad_hero_badge') || '';
+  document.getElementById('hero_title').value = localStorage.getItem('ippad_hero_title') || '';
+  document.getElementById('hero_motto').value = localStorage.getItem('ippad_hero_motto') || '';
+  document.getElementById('hero_desc').value = localStorage.getItem('ippad_hero_desc') || '';
+  
+  const heroPhoto = localStorage.getItem('ippad_hero_photo') || '';
+  document.getElementById('hero_photo_url').value = heroPhoto;
+  highlightPicker('heroPickerGrid', heroPhoto);
+}
+
+function saveHeroContent(event) {
+  event.preventDefault();
+  
+  const badge = document.getElementById('hero_badge').value;
+  const title = document.getElementById('hero_title').value;
+  const motto = document.getElementById('hero_motto').value;
+  const desc = document.getElementById('hero_desc').value;
+  const photo = document.getElementById('hero_photo_url').value;
+
+  if (supabase) {
+    showToast("Saving to cloud database...");
+    supabase.from('hero_content').upsert([{
+      id: 'main_hero',
+      badge,
+      title,
+      motto,
+      description: desc,
+      photo_url: photo
+    }]).then(({ error }) => {
+      if (error) {
+        console.error(error);
+        showToast("Cloud update failed.");
+      } else {
+        showToast("Homepage Hero Content updated on Supabase!");
+      }
+    });
+    return;
+  }
+
+  localStorage.setItem('ippad_hero_badge', badge);
+  localStorage.setItem('ippad_hero_title', title);
+  localStorage.setItem('ippad_hero_motto', motto);
+  localStorage.setItem('ippad_hero_desc', desc);
+  localStorage.setItem('ippad_hero_photo', photo);
+  showToast("Homepage Hero Content updated successfully!");
+}
+
+// Announcements (Posts)
+function renderPosts() {
+  const list = document.getElementById('postsList');
+  list.innerHTML = '';
+
+  const fetchAction = supabase 
+    ? supabase.from('posts').select('*').order('created_at', { ascending: false }).then(({ data, error }) => {
+        if (error) throw error;
+        return data || [];
+      })
+    : Promise.resolve(JSON.parse(localStorage.getItem('ippad_posts') || '[]'));
+
+  fetchAction.then(posts => {
+    if (posts.length === 0) {
+      list.innerHTML = '<p style="color: var(--text-light); text-align: center; padding: 24px;">No news or announcements currently posted.</p>';
+      return;
+    }
+    
+    posts.forEach(post => {
+      const row = document.createElement('div');
+      row.className = 'item-row';
+      
+      row.innerHTML = `
+        <img src="logo.jpeg" alt="Preview" class="item-preview" id="post_img_${post.id}"/>
+        <div class="item-details">
+          <h4>${post.title}</h4>
+          <p>${post.content}</p>
+          <span class="badge">${post.date}</span>
+        </div>
+        <button onclick="window.deletePost('${post.id}')" class="btn-danger"><i data-lucide="trash-2"></i> Delete</button>
+      `;
+      list.appendChild(row);
+      
+      const imgEl = document.getElementById(`post_img_${post.id}`);
+      if (imgEl) resolveMediaSrc(imgEl, post.image);
+    });
+    if (window.lucide) lucide.createIcons();
+  }).catch(err => {
+    console.error(err);
+    list.innerHTML = '<p style="color: red; text-align: center; padding: 24px;">Error fetching news.</p>';
+  });
+}
+
+function handleAddPost(event) {
+  event.preventDefault();
+  
+  const newPost = {
+    id: 'post_' + Date.now(),
+    title: document.getElementById('post_title').value,
+    date: document.getElementById('post_date').value,
+    content: document.getElementById('post_content').value,
+    image: document.getElementById('post_image_url').value || 'logo.jpeg'
+  };
+
+  const addAction = supabase
+    ? supabase.from('posts').insert([newPost])
+    : Promise.resolve().then(() => {
+        const posts = JSON.parse(localStorage.getItem('ippad_posts') || '[]');
+        posts.unshift(newPost);
+        localStorage.setItem('ippad_posts', JSON.stringify(posts));
+      });
+
+  addAction.then(({ error } = {}) => {
+    if (error) throw error;
+    closeModal('modalPost');
+    renderPosts();
+    showToast("Announcement added successfully!");
+    event.target.reset();
+    const fileLbl = document.getElementById('post_file_label');
+    if (fileLbl) fileLbl.innerText = '(waiting for file...)';
+    document.getElementById('modalPost').querySelectorAll('.picker-item').forEach(p => p.classList.remove('selected'));
+  }).catch(err => {
+    console.error(err);
+    showToast("Failed to add announcement.");
+  });
+}
+
+function deletePost(id) {
+  const deleteAction = supabase
+    ? supabase.from('posts').delete().eq('id', id)
+    : Promise.resolve().then(() => {
+        let posts = JSON.parse(localStorage.getItem('ippad_posts') || '[]');
+        posts = posts.filter(p => p.id !== id);
+        localStorage.setItem('ippad_posts', JSON.stringify(posts));
+      });
+
+  deleteAction.then(({ error } = {}) => {
+    if (error) throw error;
+    renderPosts();
+    showToast("Announcement deleted.");
+  }).catch(err => {
+    console.error(err);
+    showToast("Failed to delete.");
+  });
+}
+
+// Event Heroes
+function renderEvents() {
+  const list = document.getElementById('eventsList');
+  list.innerHTML = '';
+
+  const fetchAction = supabase 
+    ? supabase.from('event_heroes').select('*').order('created_at', { ascending: false }).then(({ data, error }) => {
+        if (error) throw error;
+        return data || [];
+      })
+    : Promise.resolve(JSON.parse(localStorage.getItem('ippad_event_heroes') || '[]'));
+
+  fetchAction.then(events => {
+    if (events.length === 0) {
+      list.innerHTML = '<p style="color: var(--text-light); text-align: center; padding: 24px;">No event heroes currently configured.</p>';
+      return;
+    }
+    
+    events.forEach(eh => {
+      const row = document.createElement('div');
+      row.className = 'item-row';
+      
+      row.innerHTML = `
+        <img src="logo.jpeg" alt="Preview" class="item-preview" id="event_img_${eh.id}"/>
+        <div class="item-details">
+          <h4>${eh.title}</h4>
+          <p>${eh.description}</p>
+          <span class="badge">${eh.date}</span>
+        </div>
+        <button onclick="window.deleteEvent('${eh.id}')" class="btn-danger"><i data-lucide="trash-2"></i> Delete</button>
+      `;
+      list.appendChild(row);
+      
+      const imgEl = document.getElementById(`event_img_${eh.id}`);
+      if (imgEl) resolveMediaSrc(imgEl, eh.image);
+    });
+    if (window.lucide) lucide.createIcons();
+  }).catch(err => {
+    console.error(err);
+    list.innerHTML = '<p style="color: red; text-align: center; padding: 24px;">Error fetching events.</p>';
+  });
+}
+
+function handleAddEvent(event) {
+  event.preventDefault();
+  
+  const newEH = {
+    id: 'eh_' + Date.now(),
+    title: document.getElementById('event_title').value,
+    date: document.getElementById('event_date').value,
+    description: document.getElementById('event_desc').value,
+    image: document.getElementById('event_image_url').value || 'logo.jpeg'
+  };
+
+  const addAction = supabase
+    ? supabase.from('event_heroes').insert([newEH])
+    : Promise.resolve().then(() => {
+        const events = JSON.parse(localStorage.getItem('ippad_event_heroes') || '[]');
+        events.push(newEH);
+        localStorage.setItem('ippad_event_heroes', JSON.stringify(events));
+      });
+
+  addAction.then(({ error } = {}) => {
+    if (error) throw error;
+    closeModal('modalEvent');
+    renderEvents();
+    showToast("Featured Event Hero photo added!");
+    event.target.reset();
+    const fileLbl = document.getElementById('event_file_label');
+    if (fileLbl) fileLbl.innerText = '(waiting for file...)';
+    document.getElementById('modalEvent').querySelectorAll('.picker-item').forEach(p => p.classList.remove('selected'));
+  }).catch(err => {
+    console.error(err);
+    showToast("Failed to add event hero.");
+  });
+}
+
+function deleteEvent(id) {
+  const deleteAction = supabase
+    ? supabase.from('event_heroes').delete().eq('id', id)
+    : Promise.resolve().then(() => {
+        let events = JSON.parse(localStorage.getItem('ippad_event_heroes') || '[]');
+        events = events.filter(e => e.id !== id);
+        localStorage.setItem('ippad_event_heroes', JSON.stringify(events));
+      });
+
+  deleteAction.then(({ error } = {}) => {
+    if (error) throw error;
+    renderEvents();
+    showToast("Event hero deleted.");
+  }).catch(err => {
+    console.error(err);
+    showToast("Failed to delete event hero.");
+  });
+}
+
+// Gallery Photos
+function renderGallery() {
+  const list = document.getElementById('galleryList');
+  list.innerHTML = '';
+
+  const fetchAction = supabase 
+    ? supabase.from('gallery').select('*').order('created_at', { ascending: false }).then(({ data, error }) => {
+        if (error) throw error;
+        return (data || []).map(item => ({ id: item.id, image_url: item.image_url }));
+      })
+    : Promise.resolve(JSON.parse(localStorage.getItem('ippad_gallery') || '[]').map((src, idx) => ({ id: idx, image_url: src })));
+
+  fetchAction.then(photos => {
+    if (photos.length === 0) {
+      list.innerHTML = '<p style="color: var(--text-light); text-align: center; padding: 24px; grid-column: 1/-1;">No photos in the gallery.</p>';
+      return;
+    }
+    
+    photos.forEach((photo) => {
+      const card = document.createElement('div');
+      card.style.background = 'var(--grey)';
+      card.style.border = '1px solid var(--border)';
+      card.style.borderRadius = '10px';
+      card.style.padding = '12px';
+      card.style.textAlign = 'center';
+      card.style.display = 'flex';
+      card.style.flexDirection = 'column';
+      card.style.gap = '10px';
+      card.style.alignItems = 'center';
+      
+      card.innerHTML = `
+        <img src="logo.jpeg" alt="Gallery photo" id="gallery_img_${photo.id}" style="width: 100%; height: 160px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border);"/>
+        <div style="font-size: 11px; color: var(--text-light); word-break: break-all; max-width: 100%; max-height: 36px; overflow: hidden;">${photo.image_url}</div>
+        <button onclick="window.deleteGalleryPhoto('${photo.id}')" class="btn-danger" style="width: 100%; justify-content: center; padding: 6px 12px;"><i data-lucide="trash-2"></i> Remove</button>
+      `;
+      list.appendChild(card);
+      
+      const imgEl = document.getElementById(`gallery_img_${photo.id}`);
+      if (imgEl) resolveMediaSrc(imgEl, photo.image_url);
+    });
+    if (window.lucide) lucide.createIcons();
+  }).catch(err => {
+    console.error(err);
+    list.innerHTML = '<p style="color: red; text-align: center; padding: 24px; grid-column: 1/-1;">Error loading gallery.</p>';
+  });
+}
+
+function handleAddGallery(event) {
+  event.preventDefault();
+  const url = document.getElementById('gallery_image_url').value;
+  if (!url) return;
+
+  const newPhoto = {
+    id: 'gal_' + Date.now(),
+    image_url: url
+  };
+
+  const addAction = supabase
+    ? supabase.from('gallery').insert([newPhoto])
+    : Promise.resolve().then(() => {
+        const photos = JSON.parse(localStorage.getItem('ippad_gallery') || '[]');
+        photos.unshift(url);
+        localStorage.setItem('ippad_gallery', JSON.stringify(photos));
+      });
+
+  addAction.then(({ error } = {}) => {
+    if (error) throw error;
+    closeModal('modalGallery');
+    renderGallery();
+    showToast("Photo added to masonry gallery!");
+    event.target.reset();
+    const fileLbl = document.getElementById('gallery_file_label');
+    if (fileLbl) fileLbl.innerText = '(waiting for file...)';
+    document.getElementById('modalGallery').querySelectorAll('.picker-item').forEach(p => p.classList.remove('selected'));
+  }).catch(err => {
+    console.error(err);
+    showToast("Failed to add photo.");
+  });
+}
+
+function deleteGalleryPhoto(id) {
+  const deleteAction = supabase
+    ? supabase.from('gallery').delete().eq('id', id)
+    : Promise.resolve().then(() => {
+        const photos = JSON.parse(localStorage.getItem('ippad_gallery') || '[]');
+        const index = parseInt(id);
+        photos.splice(index, 1);
+        localStorage.setItem('ippad_gallery', JSON.stringify(photos));
+      });
+
+  deleteAction.then(({ error } = {}) => {
+    if (error) throw error;
+    renderGallery();
+    showToast("Photo removed from gallery.");
+  }).catch(err => {
+    console.error(err);
+    showToast("Failed to remove photo.");
+  });
+}
+
+// Video Library
+function renderVideos() {
+  const list = document.getElementById('videosList');
+  list.innerHTML = '';
+
+  const fetchAction = supabase 
+    ? supabase.from('videos').select('*').order('created_at', { ascending: false }).then(({ data, error }) => {
+        if (error) throw error;
+        return data || [];
+      })
+    : Promise.resolve(JSON.parse(localStorage.getItem('ippad_videos') || '[]'));
+
+  fetchAction.then(videos => {
+    if (videos.length === 0) {
+      list.innerHTML = '<p style="color: var(--text-light); text-align: center; padding: 24px;">No videos currently in the library.</p>';
+      return;
+    }
+    
+    videos.forEach(v => {
+      const row = document.createElement('div');
+      row.className = 'item-row';
+      
+      const isYouTube = v.embed_url ? (v.embed_url.startsWith('http') || v.embed_url.includes('embed')) : (v.embedUrl.startsWith('http') || v.embedUrl.includes('embed'));
+      const embedUrl = v.embed_url || v.embedUrl;
+
+      row.innerHTML = `
+        <div class="item-video-preview">
+          <i data-lucide="${isYouTube ? 'play-circle' : 'video'}" style="width: 32px; height: 32px; color: var(--gold-light);"></i>
+        </div>
+        <div class="item-details">
+          <h4>${v.title}</h4>
+          <p>${v.description}</p>
+          <span class="badge" style="background: var(--blue-soft); color: var(--blue); border: 1px solid var(--blue-light);">${isYouTube ? 'YouTube' : 'Device File'}</span>
+        </div>
+        <button onclick="window.deleteVideo('${v.id}')" class="btn-danger"><i data-lucide="trash-2"></i> Delete</button>
+      `;
+      list.appendChild(row);
+    });
+    if (window.lucide) lucide.createIcons();
+  }).catch(err => {
+    console.error(err);
+    list.innerHTML = '<p style="color: red; text-align: center; padding: 24px;">Error fetching videos.</p>';
+  });
+}
+
+function handleAddVideo(event) {
+  event.preventDefault();
+  let url = document.getElementById('video_url').value;
+  
+  if (url.includes('youtube.com/watch?v=')) {
+    const id = url.split('v=')[1].split('&')[0];
+    url = 'https://www.youtube.com/embed/' + id;
+  } else if (url.includes('youtu.be/')) {
+    const id = url.split('youtu.be/')[1].split('?')[0];
+    url = 'https://www.youtube.com/embed/' + id;
+  }
+  
+  const newV = {
+    id: 'v_' + Date.now(),
+    title: document.getElementById('video_title').value,
+    description: document.getElementById('video_desc').value,
+    embed_url: url
+  };
+
+  const addAction = supabase
+    ? supabase.from('videos').insert([newV])
+    : Promise.resolve().then(() => {
+        newV.embedUrl = url;
+        const videos = JSON.parse(localStorage.getItem('ippad_videos') || '[]');
+        videos.push(newV);
+        localStorage.setItem('ippad_videos', JSON.stringify(videos));
+      });
+
+  addAction.then(({ error } = {}) => {
+    if (error) throw error;
+    closeModal('modalVideo');
+    renderVideos();
+    showToast("Video added successfully!");
+    event.target.reset();
+    const fileLbl = document.getElementById('video_file_label');
+    if (fileLbl) fileLbl.innerText = '(waiting for file...)';
+  }).catch(err => {
+    console.error(err);
+    showToast("Failed to add video.");
+  });
+}
+
+function deleteVideo(id) {
+  const deleteAction = supabase
+    ? supabase.from('videos').delete().eq('id', id)
+    : Promise.resolve().then(() => {
+        let videos = JSON.parse(localStorage.getItem('ippad_videos') || '[]');
+        videos = videos.filter(v => v.id !== id);
+        localStorage.setItem('ippad_videos', JSON.stringify(videos));
+      });
+
+  deleteAction.then(({ error } = {}) => {
+    if (error) throw error;
+    renderVideos();
+    showToast("Video deleted.");
+  }).catch(err => {
+    console.error(err);
+    showToast("Failed to delete video.");
+  });
+}
+
+// Reset Database Defaults
+function resetDefaults() {
+  if (confirm("WARNING: This will restore the database to its clean, initial installation states. All your added announcements, photos, and video items will be overwritten. Proceed?")) {
+    localStorage.removeItem('ippad_initialized');
+    localStorage.removeItem('ippad_gallery');
+    localStorage.removeItem('ippad_posts');
+    localStorage.removeItem('ippad_event_heroes');
+    localStorage.removeItem('ippad_videos');
+    localStorage.removeItem('ippad_hero_photo');
+    localStorage.removeItem('ippad_hero_badge');
+    localStorage.removeItem('ippad_hero_title');
+    localStorage.removeItem('ippad_hero_motto');
+    localStorage.removeItem('ippad_hero_desc');
+    
+    initSystemData();
+    loadHeroForm();
+    renderAllContent();
+    showToast("Database restored to default values successfully!");
+  }
+}
+
+function renderAllContent() {
+  renderPosts();
+  renderEvents();
+  renderGallery();
+  renderVideos();
+}
+
+// --- MODAL ENGINE CONTROLLER ---
+function openModal(id) {
+  document.getElementById(id).classList.add('show');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('show');
+}
+
+// --- TOAST NOTIFICATIONS ---
+let toastTimeout;
+function showToast(text) {
+  const toast = document.getElementById('toastBox');
+  const toastText = document.getElementById('toastText');
+  
+  toastText.innerText = text;
+  toast.classList.add('show');
+  
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => {
+    toast.classList.remove('show');
+  }, 3500);
+}
+
+// Explicit global window registrations
+window.handleLogin = handleLogin;
+window.handleLogout = handleLogout;
+window.switchTab = switchTab;
+window.openModal = openModal;
+window.closeModal = closeModal;
+window.resetDefaults = resetDefaults;
+window.saveHeroContent = saveHeroContent;
+window.handleAddPost = handleAddPost;
+window.handleAddEvent = handleAddEvent;
+window.handleAddGallery = handleAddGallery;
+window.handleAddVideo = handleAddVideo;
+window.deletePost = deletePost;
+window.deleteEvent = deleteEvent;
+window.deleteGalleryPhoto = deleteGalleryPhoto;
+window.deleteVideo = deleteVideo;
+window.handleFileUpload = handleFileUpload;
+</script>
+</body>
+</html>
