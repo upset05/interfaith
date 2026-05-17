@@ -1381,7 +1381,7 @@ function handleLogin(event) {
     event.preventDefault();
   }
   const passInput = document.getElementById('password');
-  const pass = passInput ? passInput.value.trim() : '';
+  const pass = passInput ? passInput.value.trim().toLowerCase() : '';
   
   if (pass === 'ippad2026') {
     try {
