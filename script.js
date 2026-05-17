@@ -142,7 +142,21 @@ function resolveMediaSrc(element, src, property = 'src') {
 }
 
 function toggleMenu() {
-  document.getElementById('mobileMenu').classList.toggle('open');
+  const menu = document.getElementById('mobileMenu');
+  if (menu) menu.classList.toggle('open');
+  
+  let overlay = document.getElementById('mobileMenuOverlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'mobileMenuOverlay';
+    overlay.className = 'mobile-menu-overlay';
+    document.body.appendChild(overlay);
+    overlay.addEventListener('click', () => {
+      if (menu) menu.classList.remove('open');
+      overlay.classList.remove('open');
+    });
+  }
+  overlay.classList.toggle('open');
 }
 
 window.addEventListener('scroll', () => {
@@ -155,7 +169,10 @@ window.addEventListener('scroll', () => {
 // Close mobile menu when a link is clicked
 document.querySelectorAll('.mobile-menu a').forEach(link => {
   link.addEventListener('click', () => {
-    document.getElementById('mobileMenu').classList.remove('open');
+    const menu = document.getElementById('mobileMenu');
+    if (menu) menu.classList.remove('open');
+    const overlay = document.getElementById('mobileMenuOverlay');
+    if (overlay) overlay.classList.remove('open');
   });
 });
 
@@ -796,3 +813,15 @@ document.addEventListener('DOMContentLoaded', () => {
 // Keep as global fallback in case any page still has onclick="toggleMenu()"
 window.toggleMenu = toggleMenu;
 
+// --- DYNAMIC DARK MODE ---
+function applyTimeBasedTheme() {
+  const hour = new Date().getHours();
+  // Dark mode between 18:00 (6 PM) and 6:00 (6 AM)
+  if (hour >= 18 || hour < 6) {
+    document.body.classList.add('dark-mode');
+  } else {
+    document.body.classList.remove('dark-mode');
+  }
+}
+applyTimeBasedTheme();
+setInterval(applyTimeBasedTheme, 60000);
