@@ -1016,6 +1016,34 @@ header {
 </div>
 
 <script>
+// --- SAFE STORAGE FALLBACK ---
+const safeLocalStorage = {
+  _data: {},
+  getItem: function(key) {
+    try { return window.localStorage.getItem(key); } catch (e) { return this._data[key] || null; }
+  },
+  setItem: function(key, value) {
+    try { window.localStorage.setItem(key, value); } catch (e) { this._data[key] = String(value); }
+  },
+  removeItem: function(key) {
+    try { window.localStorage.removeItem(key); } catch (e) { delete this._data[key]; }
+  }
+};
+const safeSessionStorage = {
+  _data: {},
+  getItem: function(key) {
+    try { return window.sessionStorage.getItem(key); } catch (e) { return this._data[key] || null; }
+  },
+  setItem: function(key, value) {
+    try { window.sessionStorage.setItem(key, value); } catch (e) { this._data[key] = String(value); }
+  },
+  removeItem: function(key) {
+    try { window.sessionStorage.removeItem(key); } catch (e) { delete this._data[key]; }
+  }
+};
+const localStorage = safeLocalStorage;
+const sessionStorage = safeSessionStorage;
+
 // Array of local pictures extracted from project
 const projectImages = [
   "WhatsApp Image 2026-05-01 at 5.53.05 PM (1).jpeg",

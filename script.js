@@ -1,3 +1,32 @@
+// --- SAFE STORAGE FALLBACK ---
+const safeLocalStorage = {
+  _data: {},
+  getItem: function(key) {
+    try {
+      return window.localStorage.getItem(key);
+    } catch (e) {
+      console.warn("localStorage.getItem blocked, using memory fallback:", e);
+      return this._data[key] || null;
+    }
+  },
+  setItem: function(key, value) {
+    try {
+      window.localStorage.setItem(key, value);
+    } catch (e) {
+      console.warn("localStorage.setItem blocked, using memory fallback:", e);
+      this._data[key] = String(value);
+    }
+  },
+  removeItem: function(key) {
+    try {
+      window.localStorage.removeItem(key);
+    } catch (e) {
+      delete this._data[key];
+    }
+  }
+};
+const localStorage = safeLocalStorage;
+
 // --- CONFIGURATION CONSTANTS ---
 // Paste your Supabase project credentials here to go live globally!
 const SUPABASE_URL = "https://jdgzxvwgvmssayobbdrz.supabase.co"; 
