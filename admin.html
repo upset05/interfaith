@@ -844,7 +844,7 @@ header {
   <div class="header-actions">
     <a href="index.html" class="btn-secondary" target="_blank"><i data-lucide="external-link"></i> <span>Live Website</span></a>
     <button onclick="handleLogout()" class="btn-danger-outline">Lock Portal</button>
-    <button class="mobile-menu-btn" id="sidebarToggle" aria-label="Open menu" onclick="openSidebar()">
+    <button class="mobile-menu-btn" id="sidebarToggle" aria-label="Open menu">
       <span></span><span></span><span></span>
     </button>
   </div>
@@ -852,44 +852,7 @@ header {
 
 <!-- Sidebar backdrop overlay (mobile only) -->
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
-<script>
-// ============ SELF-CONTAINED MOBILE SIDEBAR MODULE ============
-// Elements are looked up at CALL TIME (not init time) because
-// adminSidebar and sidebarClose appear later in the DOM.
-(function() {
-  function openSidebar() {
-    var sidebar = document.getElementById('adminSidebar');
-    var overlay = document.getElementById('sidebarOverlay');
-    var closeBtn = document.getElementById('sidebarClose');
-    if (sidebar) sidebar.classList.add('open');
-    if (overlay) overlay.classList.add('open');
-    if (closeBtn) closeBtn.style.display = 'block';
-    document.body.style.overflow = 'hidden';
-  }
 
-  function closeSidebar() {
-    var sidebar = document.getElementById('adminSidebar');
-    var overlay = document.getElementById('sidebarOverlay');
-    var closeBtn = document.getElementById('sidebarClose');
-    if (sidebar) sidebar.classList.remove('open');
-    if (overlay) overlay.classList.remove('open');
-    if (closeBtn) closeBtn.style.display = 'none';
-    document.body.style.overflow = '';
-  }
-
-  // Wire up the hamburger button (exists in DOM already)
-  var toggleBtn = document.getElementById('sidebarToggle');
-  if (toggleBtn) toggleBtn.addEventListener('click', openSidebar);
-
-  // Wire up the overlay backdrop (exists in DOM already)
-  var overlayEl = document.getElementById('sidebarOverlay');
-  if (overlayEl) overlayEl.addEventListener('click', closeSidebar);
-
-  // Expose globally for inline onclick handlers (tab switching, close button)
-  window.openSidebar = openSidebar;
-  window.closeSidebar = closeSidebar;
-})();
-</script>
 
 <div class="admin-container">
   <!-- SIDEBAR MENU -->
@@ -2243,6 +2206,57 @@ window.deleteEvent = deleteEvent;
 window.deleteGalleryPhoto = deleteGalleryPhoto;
 window.deleteVideo = deleteVideo;
 window.handleFileUpload = handleFileUpload;
+</script>
+
+<script>
+// ============ MOBILE SIDEBAR — FINAL FAILSAFE ============
+// This runs LAST, after ALL DOM elements exist. Zero timing issues.
+(function() {
+  var hamburger   = document.getElementById('sidebarToggle');
+  var sidebar     = document.getElementById('adminSidebar');
+  var overlay     = document.getElementById('sidebarOverlay');
+  var closeBtn    = document.getElementById('sidebarClose');
+
+  function openSidebar() {
+    if (sidebar) sidebar.classList.add('open');
+    if (overlay) overlay.classList.add('open');
+    if (closeBtn) closeBtn.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeSidebar() {
+    if (sidebar) sidebar.classList.remove('open');
+    if (overlay) overlay.classList.remove('open');
+    if (closeBtn) closeBtn.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+
+  // Wire up hamburger
+  if (hamburger) {
+    hamburger.onclick = function(e) {
+      e.stopPropagation();
+      openSidebar();
+    };
+  }
+
+  // Wire up overlay click-to-close
+  if (overlay) {
+    overlay.onclick = function() {
+      closeSidebar();
+    };
+  }
+
+  // Wire up X close button
+  if (closeBtn) {
+    closeBtn.onclick = function() {
+      closeSidebar();
+    };
+  }
+
+  // Expose globally
+  window.openSidebar = openSidebar;
+  window.closeSidebar = closeSidebar;
+})();
 </script>
 </body>
 </html>
