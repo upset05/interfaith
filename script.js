@@ -145,6 +145,9 @@ function toggleMenu() {
   const menu = document.getElementById('mobileMenu');
   if (menu) menu.classList.toggle('open');
   
+  const hamburger = document.querySelector('.hamburger');
+  if (hamburger) hamburger.classList.toggle('open');
+  
   let overlay = document.getElementById('mobileMenuOverlay');
   if (!overlay) {
     overlay = document.createElement('div');
@@ -153,6 +156,7 @@ function toggleMenu() {
     document.body.appendChild(overlay);
     overlay.addEventListener('click', () => {
       if (menu) menu.classList.remove('open');
+      if (hamburger) hamburger.classList.remove('open');
       overlay.classList.remove('open');
     });
   }
@@ -171,6 +175,8 @@ document.querySelectorAll('.mobile-menu a').forEach(link => {
   link.addEventListener('click', () => {
     const menu = document.getElementById('mobileMenu');
     if (menu) menu.classList.remove('open');
+    const hamburger = document.querySelector('.hamburger');
+    if (hamburger) hamburger.classList.remove('open');
     const overlay = document.getElementById('mobileMenuOverlay');
     if (overlay) overlay.classList.remove('open');
   });
