@@ -1372,21 +1372,31 @@ window.onload = function() {
 };
 
 function handleLogin(event) {
-  event.preventDefault();
+  if (event && typeof event.preventDefault === 'function') {
+    event.preventDefault();
+  }
   const pass = document.getElementById('password').value;
   
   if (pass === 'ippad2026') {
-    sessionStorage.setItem('ippad_admin_logged_in', 'true');
-    document.getElementById('loginOverlay').style.display = 'none';
-    showToast("Authentication successful! Welcome to IPPAD Portal.");
+    try {
+      sessionStorage.setItem('ippad_admin_logged_in', 'true');
+    } catch(e) {
+      console.warn("sessionStorage not available", e);
+    }
+    const overlay = document.getElementById('loginOverlay');
+    if (overlay) overlay.style.display = 'none';
+    if (typeof showToast === 'function') showToast("Authentication successful! Welcome to IPPAD Portal.");
   } else {
     const errorMsg = document.getElementById('errorMessage');
-    errorMsg.style.display = 'block';
+    if (errorMsg) errorMsg.style.display = 'block';
+    
     // Shake animation
     const card = document.querySelector('.login-card');
-    card.style.animation = 'none';
-    card.offsetHeight; // trigger reflow
-    card.style.animation = 'shake 0.4s';
+    if (card) {
+      card.style.animation = 'none';
+      card.offsetHeight; // trigger reflow
+      card.style.animation = 'shake 0.4s';
+    }
     
     // Add custom shake keyframes if not present
     if (!document.getElementById('shake-style')) {
