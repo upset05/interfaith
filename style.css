@@ -87,7 +87,7 @@ nav.scrolled{box-shadow:0 2px 24px rgba(0,0,0,.07);}
   background: none;
   border: none;
   padding: 4px;
-  z-index: 10002;
+  z-index: 1001; /* above nav */
 }
 .hamburger span {
   display: block;
@@ -112,156 +112,101 @@ nav.scrolled{box-shadow:0 2px 24px rgba(0,0,0,.07);}
 
 .mobile-menu {
   position: fixed;
-  top: 0;
-  right: -100%;
-  bottom: 0;
-  width: 85%;
-  max-width: 380px;
-  background: var(--white);
-  z-index: 10001; /* above nav */
-  padding: 80px 32px 32px;
-  box-shadow: -10px 0 40px rgba(0,0,0,0.15);
-  transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  top: 68px; /* directly below nav */
+  left: 0;
+  right: 0;
+  background: var(--nav-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  z-index: 999; /* below nav which is 1000 */
+  padding: 20px 24px 24px;
+  box-shadow: 0 16px 32px rgba(0,0,0,0.08);
+  
+  /* Smooth drop-down transition */
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-20px);
+  transition: opacity 0.3s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s;
+  
   display: flex;
   flex-direction: column;
+  gap: 4px;
 }
 .mobile-menu.open {
-  right: 0;
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
 }
 .mobile-menu-overlay {
   position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.4);
-  backdrop-filter: blur(8px);
-  z-index: 10000;
+  top: 68px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.3);
+  backdrop-filter: blur(4px);
+  z-index: 998;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.4s ease, visibility 0.4s ease;
+  transition: opacity 0.3s ease, visibility 0.3s;
 }
 .mobile-menu-overlay.open {
   opacity: 1;
   visibility: visible;
 }
-.mobile-brand {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 32px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid var(--border);
-}
-.mobile-brand img {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 1px solid var(--border);
-}
-.mobile-brand div {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.2;
-}
-.mobile-brand strong {
-  font-family: 'Playfair Display', serif;
-  font-size: 18px;
-  color: var(--green);
-}
-.mobile-brand span {
-  font-size: 11px;
-  color: var(--blue);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  font-weight: 500;
-}
 .mobile-menu a {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 14px 0;
-  font-size: 17px;
+  gap: 12px;
+  padding: 12px 16px;
+  font-size: 15px;
   font-weight: 500;
   color: var(--text);
   text-decoration: none;
-  border-bottom: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: all 0.3s ease;
   opacity: 0;
-  transform: translateX(30px);
-  transition: color 0.3s, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
+  transform: translateY(-10px);
+  border-bottom: none;
 }
 .mobile-menu a i {
   color: var(--green);
-  width: 20px;
-  height: 20px;
-  stroke-width: 1.8;
+  width: 18px;
+  height: 18px;
+  stroke-width: 2;
 }
 .mobile-menu a:hover, .mobile-menu a.active {
   color: var(--green);
-  transform: translateX(5px) !important;
+  background: var(--green-soft);
+  transform: none !important;
 }
 .mobile-menu.open a {
   opacity: 1;
-  transform: translateX(0);
-}
-/* Stagger delays */
-.mobile-menu.open a:nth-child(2) { transition-delay: 0.05s; }
-.mobile-menu.open a:nth-child(3) { transition-delay: 0.1s; }
-.mobile-menu.open a:nth-child(4) { transition-delay: 0.15s; }
-.mobile-menu.open a:nth-child(5) { transition-delay: 0.20s; }
-.mobile-menu.open a:nth-child(6) { transition-delay: 0.25s; }
-.mobile-menu.open a:nth-child(7) { transition-delay: 0.30s; }
-.mobile-menu.open a:nth-child(8) { transition-delay: 0.35s; }
-
-.mobile-cta {
-  color: var(--green) !important;
-  font-weight: 700 !important;
-  margin-top: 10px;
-}
-.mobile-cta i {
-  color: var(--green) !important;
-}
-.mobile-footer {
-  margin-top: auto;
-  padding-top: 20px;
-  border-top: 1px solid var(--border);
-  text-align: center;
-  opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 0.5s ease 0.4s, transform 0.5s ease 0.4s;
-}
-.mobile-menu.open .mobile-footer {
-  opacity: 1;
   transform: translateY(0);
 }
-.mobile-footer p {
-  font-size: 12px;
-  color: var(--text-light);
-  margin-bottom: 12px;
-  font-style: italic;
-}
-.mobile-socials {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-}
-.mobile-socials a {
-  opacity: 1 !important;
-  transform: none !important;
-  border-bottom: none !important;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: var(--grey);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 13px;
-  color: var(--text-light) !important;
-  transition: all 0.3s !important;
-  padding: 0 !important;
-}
-.mobile-socials a:hover {
+/* Stagger delays */
+.mobile-menu.open a:nth-child(1) { transition: opacity 0.3s ease 0.04s, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) 0.04s, background-color 0.3s; }
+.mobile-menu.open a:nth-child(2) { transition: opacity 0.3s ease 0.08s, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) 0.08s, background-color 0.3s; }
+.mobile-menu.open a:nth-child(3) { transition: opacity 0.3s ease 0.12s, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) 0.12s, background-color 0.3s; }
+.mobile-menu.open a:nth-child(4) { transition: opacity 0.3s ease 0.16s, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) 0.16s, background-color 0.3s; }
+.mobile-menu.open a:nth-child(5) { transition: opacity 0.3s ease 0.20s, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) 0.20s, background-color 0.3s; }
+.mobile-menu.open a:nth-child(6) { transition: opacity 0.3s ease 0.24s, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) 0.24s, background-color 0.3s; }
+.mobile-menu.open a:nth-child(7) { transition: opacity 0.3s ease 0.28s, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) 0.28s, background-color 0.3s; }
+
+.mobile-cta {
   background: var(--green) !important;
   color: white !important;
+  justify-content: center;
+  font-weight: 600 !important;
+  margin-top: 8px;
+  padding: 12px 16px !important;
+}
+.mobile-cta i {
+  color: white !important;
+}
+.mobile-cta:hover {
+  background: var(--green-light) !important;
 }
 
 /* PAGES */
