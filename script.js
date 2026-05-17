@@ -791,3 +791,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initLiveUpdates();
 });
 
+// Explicit global registrations for inline HTML event handlers
+window.toggleMenu = toggleMenu;
+
