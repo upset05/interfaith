@@ -1384,14 +1384,15 @@ const projectImages = [
 const SUPABASE_URL = "https://jdgzxvwgvmssayobbdrz.supabase.co"; 
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpkZ3p4dndndm1zc2F5b2JiZHJ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkwMTMxMDgsImV4cCI6MjA5NDU4OTEwOH0.2OydMDLfRXz5dT0lrHwk4SVOPJom4wC86FCXDJ5FLzQ";
 
-let supabase = null;
+var supabaseLib = window.supabase;
+var supabase = null;
 
 // Initialize Supabase dynamically and wait for the library to be ready
 function initSupabase() {
   if (!SUPABASE_URL || !SUPABASE_ANON_KEY) return;
   
   const tryInit = () => {
-    const lib = window.supabase;
+    const lib = supabaseLib || window.supabase;
     if (lib && typeof lib.createClient === 'function') {
       try {
         supabase = lib.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
