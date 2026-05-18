@@ -728,13 +728,13 @@ footer{background:#0c1a10;color:rgba(255,255,255,.65);padding:56px 80px 28px;}
   .founder-grid{grid-template-columns:1fr; text-align: center; gap: 24px;}
   .founder-avatar{display:flex; margin: 0 auto; width: 140px; height: 140px;}
   .page-hero{padding:52px 40px;}
-  .page { padding-top: 106px !important; }
+  .page { padding-top: 130px !important; }
   nav {
     height: auto !important;
     flex-direction: column !important;
-    padding: 10px 16px 8px !important;
+    padding: 10px 16px 12px !important;
     align-items: stretch !important;
-    gap: 10px !important;
+    gap: 12px !important;
   }
   .nav-brand {
     justify-content: flex-start !important;
@@ -753,14 +753,11 @@ footer{background:#0c1a10;color:rgba(255,255,255,.65);padding:56px 80px 28px;}
   }
   .nav-links {
     display: flex !important;
-    gap: 8px !important;
-    overflow-x: auto !important;
-    -webkit-overflow-scrolling: touch !important;
-    scroll-behavior: smooth !important;
-    padding: 2px 16px 8px !important;
-    margin: 0 -16px !important;
-    scrollbar-width: none !important;
-    -ms-overflow-style: none !important;
+    gap: 6px !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    margin: 0 !important;
   }
   .nav-links::-webkit-scrollbar {
     display: none !important;
@@ -776,9 +773,9 @@ footer{background:#0c1a10;color:rgba(255,255,255,.65);padding:56px 80px 28px;}
     z-index: 10 !important;
   }
   .nav-links a {
-    font-size: 12px !important;
+    font-size: 11px !important;
     font-weight: 600 !important;
-    padding: 6px 12px !important;
+    padding: 5px 10px !important;
     background: var(--grey) !important;
     border: 1px solid var(--border) !important;
     border-radius: 20px !important;

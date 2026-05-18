@@ -1465,34 +1465,45 @@ function resolveMediaSrc(element, src, property = 'src') {
     if (element) element[property] = src;
     return Promise.resolve(src);
   }
-  
-  // If Supabase is active, check if it's a file path to resolve from storage bucket
-  if (supabase) {
-    try {
-      const { data } = supabase.storage.from('images').getPublicUrl(src);
-      if (data && data.publicUrl) {
-        const publicUrl = data.publicUrl;
-        if (element) element[property] = publicUrl;
-        return Promise.resolve(publicUrl);
-      }
-    } catch (e) {
-      console.warn("Failed to get public URL from Supabase storage:", e);
-    }
-  }
 
-  return getMedia(src).then(file => {
-    if (file) {
-      const objectUrl = URL.createObjectURL(file);
-      if (element) {
-        element[property] = objectUrl;
-      }
-      return objectUrl;
-    }
-    if (element) element[property] = src;
-    return src;
-  }).catch(err => {
-    if (element) element[property] = src;
-    return src;
+  // 1. Try the local relative path first — works when files exist in the project folder
+  return new Promise((resolve) => {
+    const probe = new Image();
+    probe.onload = () => {
+      if (element) element[property] = src;
+      resolve(src);
+    };
+    probe.onerror = () => {
+      // 2. Try IndexedDB (locally uploaded files cached in browser)
+      getMedia(src).then(file => {
+        if (file) {
+          const objectUrl = URL.createObjectURL(file);
+          if (element) element[property] = objectUrl;
+          resolve(objectUrl);
+          return;
+        }
+        // 3. Try Supabase storage as last resort
+        if (supabase) {
+          try {
+            const { data } = supabase.storage.from('images').getPublicUrl(src);
+            if (data && data.publicUrl) {
+              if (element) element[property] = data.publicUrl;
+              resolve(data.publicUrl);
+              return;
+            }
+          } catch (e) {
+            console.warn("Supabase URL resolution failed:", e);
+          }
+        }
+        // Final fallback: use the raw src
+        if (element) element[property] = src;
+        resolve(src);
+      }).catch(() => {
+        if (element) element[property] = src;
+        resolve(src);
+      });
+    };
+    probe.src = src;
   });
 }
 
