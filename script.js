@@ -810,6 +810,20 @@ function initLiveUpdates() {
 document.addEventListener('DOMContentLoaded', () => {
   initLiveUpdates();
 
+  // Center active navigation link on mobile horizontal scroll
+  const activeLink = document.querySelector('.nav-links a.active');
+  if (activeLink && window.innerWidth <= 1024) {
+    const container = document.querySelector('.nav-links');
+    if (container) {
+      setTimeout(() => {
+        const activeRect = activeLink.getBoundingClientRect();
+        const containerRect = container.getBoundingClientRect();
+        const scrollLeft = activeLink.offsetLeft - (containerRect.width / 2) + (activeRect.width / 2);
+        container.scrollLeft = scrollLeft;
+      }, 100);
+    }
+  }
+
   // Bind hamburger buttons via JS (reliable on all hosts — no inline onclick needed)
   document.querySelectorAll('.hamburger').forEach(btn => {
     btn.addEventListener('click', toggleMenu);
