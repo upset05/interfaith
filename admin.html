@@ -1645,7 +1645,6 @@ function highlightPicker(gridId, filename) {
 }
 
 // --- DATA ENGINE MAPPERS ---
-// --- DATA ENGINE MAPPERS ---
 function loadHeroForm() {
   if (supabase) {
     supabase.from('hero_content').select('*').eq('id', 'main_hero').single().then(({ data, error }) => {
@@ -2021,8 +2020,11 @@ function renderVideos() {
       const row = document.createElement('div');
       row.className = 'item-row';
       
-      const isYouTube = v.embed_url ? (v.embed_url.startsWith('http') || v.embed_url.includes('embed')) : (v.embedUrl.startsWith('http') || v.embedUrl.includes('embed'));
-      const embedUrl = v.embed_url || v.embedUrl;
+      const isYouTube = (() => {
+        const url = v.embed_url || v.embedUrl || '';
+        return url.startsWith('http') || url.includes('embed');
+      })();
+      const embedUrl = v.embed_url || v.embedUrl || '';
 
       row.innerHTML = `
         <div class="item-video-preview">

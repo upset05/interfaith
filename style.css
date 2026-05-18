@@ -735,6 +735,7 @@ footer{background:#0c1a10;color:rgba(255,255,255,.65);padding:56px 80px 28px;}
     padding: 10px 16px 12px !important;
     align-items: stretch !important;
     gap: 12px !important;
+    position: relative !important;
   }
   .nav-brand {
     justify-content: flex-start !important;
@@ -791,10 +792,16 @@ footer{background:#0c1a10;color:rgba(255,255,255,.65);padding:56px 80px 28px;}
   .nav-cta {
     background: var(--green) !important;
     color: white !important;
+    border-color: var(--green) !important;
     border-radius: 20px !important;
     padding: 8px 16px !important;
     font-weight: 700 !important;
     box-shadow: 0 4px 12px rgba(26,92,56,0.18) !important;
+  }
+  .nav-cta:hover {
+    background: var(--green-light) !important;
+    color: white !important;
+    border-color: var(--green-light) !important;
   }
   .hamburger {
     display: none !important;

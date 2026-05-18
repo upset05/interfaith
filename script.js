@@ -43,9 +43,11 @@ function initSupabase() {
       try {
         supabase = lib.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         console.log("Supabase Client initialized successfully!");
-        // Re-trigger layout renders once Supabase is connected
-        if (typeof initLiveUpdates === 'function') {
-          initLiveUpdates();
+        // Only re-render if DOM is already ready (avoids double render race condition)
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+          if (typeof initLiveUpdates === 'function') {
+            initLiveUpdates();
+          }
         }
       } catch (e) {
         console.error("Failed to initialize Supabase client:", e);
@@ -797,9 +799,9 @@ function renderVideosUI() {
 }
 
 function triggerAnimationsReveal() {
-  const dynReveals = document.querySelectorAll('.reveal');
+  // Only observe NEW elements that haven't been activated yet
+  const dynReveals = document.querySelectorAll('.reveal:not(.active)');
   dynReveals.forEach(el => {
-    el.classList.add('reveal');
     if (typeof revealObserver !== 'undefined') {
       revealObserver.observe(el);
     } else {
@@ -821,19 +823,8 @@ function initLiveUpdates() {
 document.addEventListener('DOMContentLoaded', () => {
   initLiveUpdates();
 
-  // Center active navigation link on mobile horizontal scroll
-  const activeLink = document.querySelector('.nav-links a.active');
-  if (activeLink && window.innerWidth <= 1024) {
-    const container = document.querySelector('.nav-links');
-    if (container) {
-      setTimeout(() => {
-        const activeRect = activeLink.getBoundingClientRect();
-        const containerRect = container.getBoundingClientRect();
-        const scrollLeft = activeLink.offsetLeft - (containerRect.width / 2) + (activeRect.width / 2);
-        container.scrollLeft = scrollLeft;
-      }, 100);
-    }
-  }
+  // Apply dark mode immediately on DOM ready
+  applyTimeBasedTheme();
 
   // Bind hamburger buttons via JS (reliable on all hosts — no inline onclick needed)
   document.querySelectorAll('.hamburger').forEach(btn => {
@@ -854,5 +845,5 @@ function applyTimeBasedTheme() {
     document.body.classList.remove('dark-mode');
   }
 }
-applyTimeBasedTheme();
+// Run on interval to keep theme in sync (initial call moved to DOMContentLoaded)
 setInterval(applyTimeBasedTheme, 60000);
