@@ -789,7 +789,7 @@ footer{background:#0c1a10;color:rgba(255,255,255,.65);padding:56px 80px 28px;}
     border-color: var(--green) !important;
     color: var(--green) !important;
   }
-  .nav-cta {
+  .nav-links a.nav-cta {
     background: var(--green) !important;
     color: white !important;
     border-color: var(--green) !important;
@@ -798,7 +798,7 @@ footer{background:#0c1a10;color:rgba(255,255,255,.65);padding:56px 80px 28px;}
     font-weight: 700 !important;
     box-shadow: 0 4px 12px rgba(26,92,56,0.18) !important;
   }
-  .nav-cta:hover {
+  .nav-links a.nav-cta:hover {
     background: var(--green-light) !important;
     color: white !important;
     border-color: var(--green-light) !important;

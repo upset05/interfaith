@@ -746,7 +746,7 @@ header {
 <!-- LOGIN OVERLAY -->
 <div class="login-overlay" id="loginOverlay">
   <div class="login-card">
-    <img src="logo.jpeg" alt="IPPAD Logo" class="login-logo"/>
+    <img loading="lazy" src="logo.jpeg" alt="IPPAD Logo" class="login-logo"/>
     <h2>Admin Access</h2>
     <p style="margin-bottom: 24px;">Please enter the administrative password to manage the website content.</p>
     <div id="loginFormWrapper">
@@ -835,7 +835,7 @@ header {
 <div id="mainDashboard" style="display: none;">
 <header>
   <div class="header-brand">
-    <img src="logo.jpeg" alt="IPPAD Logo" class="header-logo"/>
+    <img loading="lazy" src="logo.jpeg" alt="IPPAD Logo" class="header-logo"/>
     <div class="header-title">
       <h1>IPPAD Content Engine</h1>
       <p>Imams & Pastors Interfaith Forum for Peace and Development</p>
@@ -1595,6 +1595,21 @@ function switchTab(tabId, btn) {
 function initPickers() {
   const grids = ['heroPickerGrid', 'postPickerGrid', 'eventPickerGrid', 'galleryPickerGrid'];
   
+  // High-performance lazy loader for admin picker images
+  const adminLazyObserver = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const img = entry.target;
+        const src = img.dataset.lazySrc;
+        if (src) {
+          resolveMediaSrc(img, src);
+          img.removeAttribute('data-lazy-src');
+        }
+        observer.unobserve(img);
+      }
+    });
+  }, { rootMargin: "100px" });
+  
   grids.forEach(gridId => {
     const grid = document.getElementById(gridId);
     if (!grid) return;
@@ -1608,7 +1623,10 @@ function initPickers() {
       const img = document.createElement('img');
       img.alt = imgName;
       img.loading = "lazy";
-      resolveMediaSrc(img, imgName); // Bug fix: was using raw img.src which 404s on Render when Supabase is active
+      img.dataset.lazySrc = imgName; // Defer resolution until visible
+      
+      // Observe the image
+      adminLazyObserver.observe(img);
       
       item.appendChild(img);
       
@@ -1729,7 +1747,7 @@ function renderPosts() {
       row.className = 'item-row';
       
       row.innerHTML = `
-        <img src="logo.jpeg" alt="Preview" class="item-preview" id="post_img_${post.id}"/>
+        <img loading="lazy" src="logo.jpeg" alt="Preview" class="item-preview" id="post_img_${post.id}"/>
         <div class="item-details">
           <h4>${post.title}</h4>
           <p>${post.content}</p>
@@ -1825,7 +1843,7 @@ function renderEvents() {
       row.className = 'item-row';
       
       row.innerHTML = `
-        <img src="logo.jpeg" alt="Preview" class="item-preview" id="event_img_${eh.id}"/>
+        <img loading="lazy" src="logo.jpeg" alt="Preview" class="item-preview" id="event_img_${eh.id}"/>
         <div class="item-details">
           <h4>${eh.title}</h4>
           <p>${eh.description}</p>
@@ -1929,7 +1947,7 @@ function renderGallery() {
       card.style.alignItems = 'center';
       
       card.innerHTML = `
-        <img src="logo.jpeg" alt="Gallery photo" id="gallery_img_${photo.id}" style="width: 100%; height: 160px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border);"/>
+        <img loading="lazy" src="logo.jpeg" alt="Gallery photo" id="gallery_img_${photo.id}" style="width: 100%; height: 160px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border);"/>
         <div style="font-size: 11px; color: var(--text-light); word-break: break-all; max-width: 100%; max-height: 36px; overflow: hidden;">${photo.image_url}</div>
         <button onclick="window.deleteGalleryPhoto('${photo.id}')" class="btn-danger" style="width: 100%; justify-content: center; padding: 6px 12px;"><i data-lucide="trash-2"></i> Remove</button>
       `;
