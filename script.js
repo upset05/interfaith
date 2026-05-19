@@ -521,21 +521,31 @@ function getEventHeroesList() {
   return Promise.resolve(JSON.parse(sysStorage.getItem('ippad_event_heroes') || '[]'));
 }
 
+function safeGetLocalGallery() {
+  try {
+    const val = sysStorage.getItem('ippad_gallery');
+    if (!val || val === 'undefined') return defaultGalleryImages || [];
+    const parsed = JSON.parse(val);
+    return Array.isArray(parsed) ? parsed : (defaultGalleryImages || []);
+  } catch(e) {
+    return defaultGalleryImages || [];
+  }
+}
+
 function getGalleryPhotosList() {
   if (supabase) {
     return supabase.from('gallery').select('*').then(({ data, error }) => {
       if (error) throw error;
-      const urls = (data || []).map(item => item.image_url);
-      if (urls.length === 0) {
-        return JSON.parse(sysStorage.getItem('ippad_gallery') || '[]');
-      }
-      return urls;
+      const cloudUrls = (data || []).map(item => item.image_url);
+      
+      // Combine new cloud photos with old local GitHub photos
+      return [...cloudUrls, ...(defaultGalleryImages || [])];
     }).catch(err => {
       console.warn("Supabase fetch gallery failed, fallback to local storage:", err);
-      return JSON.parse(sysStorage.getItem('ippad_gallery') || '[]');
+      return safeGetLocalGallery();
     });
   }
-  return Promise.resolve(JSON.parse(sysStorage.getItem('ippad_gallery') || '[]'));
+  return Promise.resolve(safeGetLocalGallery());
 }
 
 function getVideosList() {
