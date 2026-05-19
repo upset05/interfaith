@@ -113,6 +113,12 @@ function resolveMediaSrc(element, src, property = 'src') {
     return Promise.resolve(src);
   }
 
+  // Directly assign local relative files to bypass probe/Supabase fallbacks
+  if (src.startsWith('WhatsApp Image') || src === 'logo.jpeg') {
+    if (element) element[property] = src;
+    return Promise.resolve(src);
+  }
+
   // 1. Try the local relative path first — works when files exist in the project folder
   return new Promise((resolve) => {
     const probe = new Image();
@@ -196,7 +202,7 @@ document.querySelectorAll('.mobile-menu a').forEach(link => {
 });
 
 // Reveal on scroll
-const revealElements = document.querySelectorAll('.reveal, .section, .card, .prog-card, .obj-item, .impact-item, .about-photo, .founder-card, .footer-col');
+const revealElements = document.querySelectorAll('.reveal, .card, .prog-card, .obj-item, .impact-item, .about-photo, .founder-card, .event-card');
 revealElements.forEach(el => el.classList.add('reveal'));
 
 const revealObserver = new IntersectionObserver((entries) => {
@@ -206,7 +212,7 @@ const revealObserver = new IntersectionObserver((entries) => {
       revealObserver.unobserve(entry.target);
     }
   });
-}, { threshold: 0.15 });
+}, { threshold: 0.05, rootMargin: '0px 0px -20px 0px' });
 
 revealElements.forEach(el => revealObserver.observe(el));
 
@@ -382,7 +388,7 @@ const defaultGalleryImages = [
 
 // Initialize dynamic system data if not already set
 function initSystemData() {
-  if (!sysStorage.getItem('ippad_initialized')) {
+  if (!sysStorage.getItem('ippad_initialized_v3')) {
     sysStorage.setItem('ippad_hero_photo', 'WhatsApp Image 2026-05-07 at 1.27.03 PM.jpeg');
     sysStorage.setItem('ippad_hero_badge', 'Different Faiths, One Humanity');
     sysStorage.setItem('ippad_hero_title', 'Imams & Pastors<br/><em>Interfaith Forum</em><br/>for Peace & Development');
@@ -448,7 +454,7 @@ function initSystemData() {
     sysStorage.setItem('ippad_gallery', JSON.stringify(defaultGalleryImages));
     
     // Set initialization flag
-    sysStorage.setItem('ippad_initialized', 'true');
+    sysStorage.setItem('ippad_initialized_v3', 'true');
   }
 }
 
@@ -487,7 +493,10 @@ function getPostsList() {
   if (supabase) {
     return supabase.from('posts').select('*').order('created_at', { ascending: false }).then(({ data, error }) => {
       if (error) throw error;
-      return data || [];
+      if (!data || data.length === 0) {
+        return JSON.parse(sysStorage.getItem('ippad_posts') || '[]');
+      }
+      return data;
     }).catch(err => {
       console.warn("Supabase fetch posts failed, fallback to local storage:", err);
       return JSON.parse(sysStorage.getItem('ippad_posts') || '[]');
@@ -500,7 +509,10 @@ function getEventHeroesList() {
   if (supabase) {
     return supabase.from('event_heroes').select('*').order('created_at', { ascending: false }).then(({ data, error }) => {
       if (error) throw error;
-      return data || [];
+      if (!data || data.length === 0) {
+        return JSON.parse(sysStorage.getItem('ippad_event_heroes') || '[]');
+      }
+      return data;
     }).catch(err => {
       console.warn("Supabase fetch event heroes failed, fallback to local storage:", err);
       return JSON.parse(sysStorage.getItem('ippad_event_heroes') || '[]');
@@ -513,7 +525,11 @@ function getGalleryPhotosList() {
   if (supabase) {
     return supabase.from('gallery').select('*').order('created_at', { ascending: false }).then(({ data, error }) => {
       if (error) throw error;
-      return (data || []).map(item => item.image_url);
+      const urls = (data || []).map(item => item.image_url);
+      if (urls.length === 0) {
+        return JSON.parse(sysStorage.getItem('ippad_gallery') || '[]');
+      }
+      return urls;
     }).catch(err => {
       console.warn("Supabase fetch gallery failed, fallback to local storage:", err);
       return JSON.parse(sysStorage.getItem('ippad_gallery') || '[]');
@@ -526,7 +542,10 @@ function getVideosList() {
   if (supabase) {
     return supabase.from('videos').select('*').order('created_at', { ascending: false }).then(({ data, error }) => {
       if (error) throw error;
-      return (data || []).map(v => ({
+      if (!data || data.length === 0) {
+        return JSON.parse(sysStorage.getItem('ippad_videos') || '[]');
+      }
+      return data.map(v => ({
         id: v.id,
         title: v.title,
         description: v.description,
