@@ -451,7 +451,7 @@ function initSystemData() {
     sysStorage.setItem('ippad_videos', JSON.stringify(defaultVideos));
 
     // Gallery images
-    sysStorage.setItem('ippad_gallery', JSON.stringify(projectImages));
+    sysStorage.setItem('ippad_gallery', JSON.stringify(defaultGalleryImages));
     
     // Set initialization flag
     sysStorage.setItem('ippad_initialized_v3', 'true');
