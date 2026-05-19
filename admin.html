@@ -2028,7 +2028,7 @@ function deleteGalleryPhoto(id) {
 function addAllProjectPhotos() {
   if (confirm("Are you sure you want to add all " + projectImages.length + " local project photos to the gallery?")) {
     const addAction = supabase 
-      ? supabase.from('gallery').insert(projectImages.map(src => ({ image_url: src })))
+      ? supabase.from('gallery').insert(projectImages.map((src, index) => ({ id: 'gal_' + Date.now() + '_' + index, image_url: src })))
       : Promise.resolve().then(() => {
           let photos = JSON.parse(sysStorage.getItem('ippad_gallery') || '[]');
           // Append ones that don't already exist
