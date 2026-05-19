@@ -386,6 +386,56 @@ const defaultGalleryImages = [
   "WhatsApp Image 2026-05-07 at 1.28.20 PM.jpeg"
 ];
 
+// --- GLOBAL DEFAULT ARRAYS ---
+const defaultPosts = [
+  {
+    id: "post_1",
+    title: "Peace Accord Signed in Zaria",
+    date: "May 12, 2026",
+    content: "Christian and Muslim youth groups officially signed a communal peace accord, pledging to reject violence and instead pool resources to support local farming cooperatives.",
+    image: "WhatsApp Image 2026-05-07 at 1.27.03 PM (1).jpeg"
+  },
+  {
+    id: "post_2",
+    title: "Grassroots Trauma Healing Workshop",
+    date: "April 28, 2026",
+    content: "Over 80 community members from conflict-affected districts in Jos participated in a three-day psychological support session organized by IPPAD's clinical unit.",
+    image: "WhatsApp Image 2026-05-07 at 1.27.13 PM (2).jpeg"
+  }
+];
+
+const defaultEventHeroes = [
+  {
+    id: "eh_1",
+    title: "Advocacy Summit on National Unity",
+    date: "April 2026",
+    description: "Clergy leaders and civil society delegates formulating action strategies for joint interfaith committees.",
+    image: "WhatsApp Image 2026-05-07 at 1.27.03 PM.jpeg"
+  },
+  {
+    id: "eh_2",
+    title: "Youth Skills & Uplift Program",
+    date: "May 2026",
+    description: "Providing start-up kits and practical agricultural coaching to local youth peace club members.",
+    image: "WhatsApp Image 2026-05-07 at 1.28.10 PM.jpeg"
+  }
+];
+
+const defaultVideos = [
+  {
+    id: "v_1",
+    title: "IPPAD Interfaith Peace Summit Highlights",
+    description: "Key moments and statements from executive leadership and community champions at the Abuja summit.",
+    embedUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+  },
+  {
+    id: "v_2",
+    title: "Community Cohesion & Dialogue in Middle Belt",
+    description: "An look inside the village mediation committees resolving conflicts in agricultural communities.",
+    embedUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+  }
+];
+
 // Initialize dynamic system data if not already set
 function initSystemData() {
   if (!sysStorage.getItem('ippad_initialized_v3')) {
@@ -395,59 +445,9 @@ function initSystemData() {
     sysStorage.setItem('ippad_hero_motto', 'IPPAD — Different Faiths, One Humanity');
     sysStorage.setItem('ippad_hero_desc', 'A faith-based, non-partisan platform uniting Muslim and Christian leaders to build peaceful, healthy, and resilient communities across Nigeria — through structured dialogue, trauma healing, and measurable community action.');
     
-    // Default posts
-    const defaultPosts = [
-      {
-        id: "post_1",
-        title: "Peace Accord Signed in Zaria",
-        date: "May 12, 2026",
-        content: "Christian and Muslim youth groups officially signed a communal peace accord, pledging to reject violence and instead pool resources to support local farming cooperatives.",
-        image: "WhatsApp Image 2026-05-07 at 1.27.03 PM (1).jpeg"
-      },
-      {
-        id: "post_2",
-        title: "Grassroots Trauma Healing Workshop",
-        date: "April 28, 2026",
-        content: "Over 80 community members from conflict-affected districts in Jos participated in a three-day psychological support session organized by IPPAD's clinical unit.",
-        image: "WhatsApp Image 2026-05-07 at 1.27.13 PM (2).jpeg"
-      }
-    ];
+    // Defaults are now globally defined above
     sysStorage.setItem('ippad_posts', JSON.stringify(defaultPosts));
-
-    // Default Event Hero Photos
-    const defaultEventHeroes = [
-      {
-        id: "eh_1",
-        title: "Advocacy Summit on National Unity",
-        date: "April 2026",
-        description: "Clergy leaders and civil society delegates formulating action strategies for joint interfaith committees.",
-        image: "WhatsApp Image 2026-05-07 at 1.27.03 PM.jpeg"
-      },
-      {
-        id: "eh_2",
-        title: "Youth Skills & Uplift Program",
-        date: "May 2026",
-        description: "Providing start-up kits and practical agricultural coaching to local youth peace club members.",
-        image: "WhatsApp Image 2026-05-07 at 1.28.10 PM.jpeg"
-      }
-    ];
     sysStorage.setItem('ippad_event_heroes', JSON.stringify(defaultEventHeroes));
-
-    // Default Videos
-    const defaultVideos = [
-      {
-        id: "v_1",
-        title: "IPPAD Interfaith Peace Summit Highlights",
-        description: "Key moments and statements from executive leadership and community champions at the Abuja summit.",
-        embedUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ"
-      },
-      {
-        id: "v_2",
-        title: "Community Cohesion & Dialogue in Middle Belt",
-        description: "An look inside the village mediation committees resolving conflicts in agricultural communities.",
-        embedUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ"
-      }
-    ];
     sysStorage.setItem('ippad_videos', JSON.stringify(defaultVideos));
 
     // Gallery images
@@ -489,36 +489,54 @@ function getDefaultHeroLocal() {
   };
 }
 
+function safeGetLocalPosts() {
+  try {
+    const val = sysStorage.getItem('ippad_posts');
+    if (!val || val === 'undefined') return defaultPosts;
+    const parsed = JSON.parse(val);
+    return Array.isArray(parsed) ? parsed : defaultPosts;
+  } catch(e) {
+    return defaultPosts;
+  }
+}
+
 function getPostsList() {
   if (supabase) {
     return supabase.from('posts').select('*').order('created_at', { ascending: false }).then(({ data, error }) => {
       if (error) throw error;
-      if (!data || data.length === 0) {
-        return JSON.parse(sysStorage.getItem('ippad_posts') || '[]');
-      }
+      if (!data || data.length === 0) return safeGetLocalPosts();
       return data;
     }).catch(err => {
       console.warn("Supabase fetch posts failed, fallback to local storage:", err);
-      return JSON.parse(sysStorage.getItem('ippad_posts') || '[]');
+      return safeGetLocalPosts();
     });
   }
-  return Promise.resolve(JSON.parse(sysStorage.getItem('ippad_posts') || '[]'));
+  return Promise.resolve(safeGetLocalPosts());
+}
+
+function safeGetLocalEventHeroes() {
+  try {
+    const val = sysStorage.getItem('ippad_event_heroes');
+    if (!val || val === 'undefined') return defaultEventHeroes;
+    const parsed = JSON.parse(val);
+    return Array.isArray(parsed) ? parsed : defaultEventHeroes;
+  } catch(e) {
+    return defaultEventHeroes;
+  }
 }
 
 function getEventHeroesList() {
   if (supabase) {
     return supabase.from('event_heroes').select('*').order('created_at', { ascending: false }).then(({ data, error }) => {
       if (error) throw error;
-      if (!data || data.length === 0) {
-        return JSON.parse(sysStorage.getItem('ippad_event_heroes') || '[]');
-      }
+      if (!data || data.length === 0) return safeGetLocalEventHeroes();
       return data;
     }).catch(err => {
       console.warn("Supabase fetch event heroes failed, fallback to local storage:", err);
-      return JSON.parse(sysStorage.getItem('ippad_event_heroes') || '[]');
+      return safeGetLocalEventHeroes();
     });
   }
-  return Promise.resolve(JSON.parse(sysStorage.getItem('ippad_event_heroes') || '[]'));
+  return Promise.resolve(safeGetLocalEventHeroes());
 }
 
 function safeGetLocalGallery() {
@@ -548,13 +566,22 @@ function getGalleryPhotosList() {
   return Promise.resolve(safeGetLocalGallery());
 }
 
+function safeGetLocalVideos() {
+  try {
+    const val = sysStorage.getItem('ippad_videos');
+    if (!val || val === 'undefined') return defaultVideos;
+    const parsed = JSON.parse(val);
+    return Array.isArray(parsed) ? parsed : defaultVideos;
+  } catch(e) {
+    return defaultVideos;
+  }
+}
+
 function getVideosList() {
   if (supabase) {
     return supabase.from('videos').select('*').order('created_at', { ascending: false }).then(({ data, error }) => {
       if (error) throw error;
-      if (!data || data.length === 0) {
-        return JSON.parse(sysStorage.getItem('ippad_videos') || '[]');
-      }
+      if (!data || data.length === 0) return safeGetLocalVideos();
       return data.map(v => ({
         id: v.id,
         title: v.title,
@@ -563,10 +590,10 @@ function getVideosList() {
       }));
     }).catch(err => {
       console.warn("Supabase fetch videos failed, fallback to local storage:", err);
-      return JSON.parse(sysStorage.getItem('ippad_videos') || '[]');
+      return safeGetLocalVideos();
     });
   }
-  return Promise.resolve(JSON.parse(sysStorage.getItem('ippad_videos') || '[]'));
+  return Promise.resolve(safeGetLocalVideos());
 }
 
 // --- DYNAMIC RENDERING CONTROLLER ---
