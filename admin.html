@@ -982,7 +982,10 @@ header {
           <h2>Main Gallery Photos ("Every Other Photo")</h2>
           <p>Manage the large masonry image gallery displaying moments of community, trauma healing, and interfaith work.</p>
         </div>
-        <button onclick="openModal('modalGallery')" class="btn-primary"><i data-lucide="plus-circle"></i> Add Photo to Gallery</button>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+          <button onclick="addAllProjectPhotos()" class="btn-primary" style="background: var(--gold); color: #111;"><i data-lucide="images"></i> Add All Project Photos</button>
+          <button onclick="openModal('modalGallery')" class="btn-primary"><i data-lucide="plus-circle"></i> Add Photo to Gallery</button>
+        </div>
       </div>
       <div class="item-list" id="galleryList" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;">
         <!-- Photos injected here -->
@@ -2022,6 +2025,30 @@ function deleteGalleryPhoto(id) {
   });
 }
 
+function addAllProjectPhotos() {
+  if (confirm("Are you sure you want to add all " + projectImages.length + " local project photos to the gallery?")) {
+    const addAction = supabase 
+      ? supabase.from('gallery').insert(projectImages.map(src => ({ image_url: src })))
+      : Promise.resolve().then(() => {
+          let photos = JSON.parse(sysStorage.getItem('ippad_gallery') || '[]');
+          // Append ones that don't already exist
+          projectImages.forEach(src => {
+            if (!photos.includes(src)) photos.push(src);
+          });
+          sysStorage.setItem('ippad_gallery', JSON.stringify(photos));
+        });
+        
+    addAction.then(({error} = {}) => {
+      if (error) throw error;
+      renderGallery();
+      showToast("All project photos added to gallery!");
+    }).catch(err => {
+      console.error(err);
+      showToast("Failed to add all photos.");
+    });
+  }
+}
+
 // Video Library
 function renderVideos() {
   const list = document.getElementById('videosList');
@@ -2154,13 +2181,15 @@ function initSystemData() {
     { id: "v_2", title: "Community Cohesion & Dialogue in Middle Belt", description: "An look inside the village mediation committees resolving conflicts in agricultural communities.", embedUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ" }
   ];
   sysStorage.setItem('ippad_videos', JSON.stringify(defaultVideos));
-  sysStorage.setItem('ippad_initialized', 'true');
+  sysStorage.setItem('ippad_gallery', JSON.stringify(projectImages));
+  sysStorage.setItem('ippad_initialized_v3', 'true');
 }
 
 function resetDefaults() {
   if (confirm("WARNING: This will restore the database to its clean, initial installation states. All your added announcements, photos, and video items will be overwritten. Proceed?")) {
     // Clear localStorage
     sysStorage.removeItem('ippad_initialized');
+    sysStorage.removeItem('ippad_initialized_v3');
     sysStorage.removeItem('ippad_gallery');
     sysStorage.removeItem('ippad_posts');
     sysStorage.removeItem('ippad_event_heroes');
