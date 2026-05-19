@@ -1466,6 +1466,12 @@ function resolveMediaSrc(element, src, property = 'src') {
     return Promise.resolve(src);
   }
 
+  // Directly assign local relative files to bypass probe/Supabase fallbacks
+  if (src.startsWith('WhatsApp Image') || src === 'logo.jpeg') {
+    if (element) element[property] = src;
+    return Promise.resolve(src);
+  }
+
   // 1. Try the local relative path first — works when files exist in the project folder
   return new Promise((resolve) => {
     const probe = new Image();
