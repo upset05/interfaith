@@ -451,7 +451,7 @@ function initSystemData() {
     sysStorage.setItem('ippad_videos', JSON.stringify(defaultVideos));
 
     // Gallery images
-    sysStorage.setItem('ippad_gallery', JSON.stringify(defaultGalleryImages));
+    sysStorage.setItem('ippad_gallery', JSON.stringify(projectImages));
     
     // Set initialization flag
     sysStorage.setItem('ippad_initialized_v3', 'true');
@@ -523,7 +523,7 @@ function getEventHeroesList() {
 
 function getGalleryPhotosList() {
   if (supabase) {
-    return supabase.from('gallery').select('*').order('created_at', { ascending: false }).then(({ data, error }) => {
+    return supabase.from('gallery').select('*').then(({ data, error }) => {
       if (error) throw error;
       const urls = (data || []).map(item => item.image_url);
       if (urls.length === 0) {
