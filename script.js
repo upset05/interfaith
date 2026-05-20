@@ -434,20 +434,7 @@ const defaultEventHeroes = [
   }
 ];
 
-const defaultVideos = [
-  {
-    id: "v_1",
-    title: "IPPAD Interfaith Peace Summit Highlights",
-    description: "Key moments and statements from executive leadership and community champions at the Abuja summit.",
-    embedUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ"
-  },
-  {
-    id: "v_2",
-    title: "Community Cohesion & Dialogue in Middle Belt",
-    description: "An look inside the village mediation committees resolving conflicts in agricultural communities.",
-    embedUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ"
-  }
-];
+const defaultVideos = [];
 
 // Initialize dynamic system data if not already set
 function initSystemData() {
@@ -596,7 +583,19 @@ function safeGetLocalVideos() {
     const val = sysStorage.getItem('ippad_videos');
     if (!val || val === 'undefined') return defaultVideos;
     const parsed = JSON.parse(val);
-    return Array.isArray(parsed) ? parsed : defaultVideos;
+    const videos = Array.isArray(parsed) ? parsed : defaultVideos;
+    const filteredVideos = videos.filter(video => {
+      if (!video || typeof video !== 'object') return false;
+      const embedUrl = video.embedUrl || video.embed_url || '';
+      const title = video.title || '';
+      // Remove legacy placeholder fallback videos that used the default embed URL.
+      if (embedUrl === 'https://www.youtube.com/embed/dQw4w9WgXcQ' &&
+          (title.includes('IPPAD Interfaith Peace Summit Highlights') || title.includes('Community Cohesion & Dialogue') || video.id === 'v_1' || video.id === 'v_2')) {
+        return false;
+      }
+      return true;
+    });
+    return filteredVideos.length > 0 ? filteredVideos : defaultVideos;
   } catch(e) {
     return defaultVideos;
   }
