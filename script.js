@@ -231,6 +231,11 @@ revealElements.forEach(el => revealObserver.observe(el));
 if (window.lucide) {
   lucide.createIcons();
 }
+window.addEventListener('load', function() {
+  if (window.lucide && typeof lucide.createIcons === 'function') {
+    lucide.createIcons();
+  }
+});
 
 // All Gallery Images (Use Supabase URLs first, then local filenames as fallback)
 const defaultGalleryImages = [
