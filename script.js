@@ -113,18 +113,29 @@ function resolveMediaSrc(element, src, property = 'src') {
     return Promise.resolve(src);
   }
 
-  // Directly assign local relative files to bypass probe/Supabase fallbacks
-  if (src.startsWith('WhatsApp Image') || src === 'logo.jpeg') {
-    if (element) element[property] = src;
-    return Promise.resolve(src);
+  // Directly assign local relative files for WhatsApp images and logo
+  if (src.startsWith('WhatsApp Image') || src === 'logo.jpeg' || src === 'founder.jpeg') {
+    const encodedSrc = encodeURI(src);
+    if (element) {
+      element[property] = encodedSrc;
+      // Force image reload
+      if (element.tagName === 'IMG') {
+        element.onerror = () => {
+          console.warn(`Failed to load image: ${src}`);
+          element.src = 'logo.jpeg'; // Fallback to logo if image fails
+        };
+      }
+    }
+    return Promise.resolve(encodedSrc);
   }
 
   // 1. Try the local relative path first — works when files exist in the project folder
   return new Promise((resolve) => {
     const probe = new Image();
+    const encodedSrc = encodeURI(src);
     probe.onload = () => {
-      if (element) element[property] = src;
-      resolve(src);
+      if (element) element[property] = encodedSrc;
+      resolve(encodedSrc);
     };
     probe.onerror = () => {
       // 2. Try IndexedDB (locally uploaded files cached in browser)
@@ -148,15 +159,15 @@ function resolveMediaSrc(element, src, property = 'src') {
             console.warn("Supabase URL resolution failed:", e);
           }
         }
-        // Final fallback: use the raw src
-        if (element) element[property] = src;
-        resolve(src);
+        // Final fallback: use the encoded src
+        if (element) element[property] = encodedSrc;
+        resolve(encodedSrc);
       }).catch(() => {
-        if (element) element[property] = src;
-        resolve(src);
+        if (element) element[property] = encodedSrc;
+        resolve(encodedSrc);
       });
     };
-    probe.src = src;
+    probe.src = encodedSrc;
   });
 }
 
@@ -542,10 +553,14 @@ function getEventHeroesList() {
 function safeGetLocalGallery() {
   try {
     const val = sysStorage.getItem('ippad_gallery');
-    if (!val || val === 'undefined') return defaultGalleryImages || [];
+    if (!val || val === 'undefined') {
+      const images = defaultGalleryImages || [];
+      return Array.isArray(images) ? images : [];
+    }
     const parsed = JSON.parse(val);
     return Array.isArray(parsed) ? parsed : (defaultGalleryImages || []);
   } catch(e) {
+    console.warn("Error parsing gallery from storage:", e);
     return defaultGalleryImages || [];
   }
 }
@@ -554,10 +569,11 @@ function getGalleryPhotosList() {
   if (supabase) {
     return supabase.from('gallery').select('*').then(({ data, error }) => {
       if (error) throw error;
-      const cloudUrls = (data || []).map(item => item.image_url);
+      const cloudUrls = (data || []).map(item => item.image_url).filter(url => url);
       
-      // Combine new cloud photos with old local GitHub photos
-      return [...cloudUrls, ...(defaultGalleryImages || [])];
+      // Combine new cloud photos with local photo names
+      const allPhotos = [...cloudUrls, ...(defaultGalleryImages || [])];
+      return allPhotos.filter(photo => photo); // Filter out any falsy values
     }).catch(err => {
       console.warn("Supabase fetch gallery failed, fallback to local storage:", err);
       return safeGetLocalGallery();
@@ -734,21 +750,32 @@ function renderGalleryUI() {
   if (!dynamicGallery) return;
 
   getGalleryPhotosList().then(galleryImages => {
+    // Filter out any null/undefined and ensure we have valid image names
+    const validImages = (galleryImages || []).filter(img => img && img.trim());
+    
     const BATCH_SIZE = 15;
     let currentIndex = 0;
 
     function renderBatch() {
-      const nextBatch = galleryImages.slice(currentIndex, currentIndex + BATCH_SIZE);
+      const nextBatch = validImages.slice(currentIndex, currentIndex + BATCH_SIZE);
       
       nextBatch.forEach(src => {
         const imgWrap = document.createElement('div');
         imgWrap.className = 'dynamic-gallery-item';
 
         const img = document.createElement('img');
-        img.src = 'logo.jpeg';
         img.alt = "IPPAD Event Photo";
         img.loading = "lazy";
+        img.style.width = '100%';
+        img.style.height = '100%';
+        img.style.objectFit = 'cover';
+        img.style.display = 'block';
         
+        // Set src directly with proper encoding
+        const encodedSrc = encodeURI(src);
+        img.src = encodedSrc;
+        
+        // Also call resolveMediaSrc for additional fallback handling
         resolveMediaSrc(img, src);
 
         imgWrap.appendChild(img);
@@ -758,7 +785,7 @@ function renderGalleryUI() {
       currentIndex += BATCH_SIZE;
 
       if (btnLoadMore && paginationContainer) {
-        if (currentIndex >= galleryImages.length) {
+        if (currentIndex >= validImages.length) {
           paginationContainer.style.display = 'none';
         } else {
           paginationContainer.style.display = 'flex';
@@ -768,7 +795,7 @@ function renderGalleryUI() {
     }
 
     dynamicGallery.innerHTML = '';
-    if (galleryImages.length > 0) {
+    if (validImages.length > 0) {
       renderBatch();
     } else {
       dynamicGallery.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-light); padding: 40px 0;">No photos in the gallery currently.</p>';
