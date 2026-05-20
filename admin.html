@@ -2026,10 +2026,12 @@ function deleteGalleryPhoto(id) {
 }
 
 function addAllProjectPhotos() {
+  if (supabase) {
+    alert("Bulk sync is disabled for cloud storage. Please add new photos individually using the 'Add Photo' button above, or run the upload script.");
+    return;
+  }
   if (confirm("Are you sure you want to add all " + projectImages.length + " local project photos to the gallery?")) {
-    const addAction = supabase 
-      ? supabase.from('gallery').insert(projectImages.map((src, index) => ({ id: 'gal_' + Date.now() + '_' + index, image_url: src })))
-      : Promise.resolve().then(() => {
+    const addAction = Promise.resolve().then(() => {
           let photos = JSON.parse(sysStorage.getItem('ippad_gallery') || '[]');
           // Append ones that don't already exist
           projectImages.forEach(src => {
