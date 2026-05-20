@@ -595,6 +595,8 @@ footer{background:#0c1a10;color:rgba(255,255,255,.65);padding:56px 80px 28px;}
   flex-direction: column;
   gap: 40px;
   position: relative;
+  width: min(100%,1180px);
+  margin: 0 auto;
 }
 .org-root {
   display: flex;
@@ -624,8 +626,8 @@ footer{background:#0c1a10;color:rgba(255,255,255,.65);padding:56px 80px 28px;}
   content: '';
   position: absolute;
   top: 0;
-  left: 10%;
-  right: 10%;
+  left: 7%;
+  right: 7%;
   height: 2px;
   background: var(--border);
 }
@@ -636,8 +638,8 @@ footer{background:#0c1a10;color:rgba(255,255,255,.65);padding:56px 80px 28px;}
   content: '';
   position: absolute;
   top: 0;
-  left: 8%;
-  right: 8%;
+  left: 7%;
+  right: 7%;
   height: 2px;
   background: var(--border);
 }
@@ -645,10 +647,11 @@ footer{background:#0c1a10;color:rgba(255,255,255,.65);padding:56px 80px 28px;}
   position: relative;
   background: var(--card-bg);
   border: 1px solid var(--border);
-  border-radius: 18px;
-  padding: 30px 24px 24px;
-  box-shadow: 0 20px 40px rgba(0,0,0,.05);
+  border-radius: 24px;
+  padding: 32px 26px 26px;
+  box-shadow: 0 24px 38px rgba(0,0,0,.08);
   text-align: center;
+  min-height: 260px;
 }
 .org-node::before {
   content: '';
@@ -664,11 +667,11 @@ footer{background:#0c1a10;color:rgba(255,255,255,.65);padding:56px 80px 28px;}
   display: none;
 }
 .org-root-node {
-  max-width: 480px;
+  max-width: 520px;
 }
 .org-icon {
-  width: 64px;
-  height: 64px;
+  width: 66px;
+  height: 66px;
   border-radius: 18px;
   margin: 0 auto 18px;
   display: flex;
@@ -692,19 +695,19 @@ footer{background:#0c1a10;color:rgba(255,255,255,.65);padding:56px 80px 28px;}
 .org-node h3,
 .org-node h4,
 .org-node h5 {
-  margin-bottom: 12px;
+  margin-bottom: 14px;
   color: var(--text);
 }
 .org-node p {
   color: var(--text-light);
   font-size: 15px;
-  line-height: 1.75;
+  line-height: 1.8;
   margin: 0;
 }
 .org-node ul {
   list-style: none;
   padding: 0;
-  margin: 14px auto 0;
+  margin: 16px auto 0;
   text-align: left;
 }
 .org-node ul li {
@@ -724,9 +727,16 @@ footer{background:#0c1a10;color:rgba(255,255,255,.65);padding:56px 80px 28px;}
   padding: 24px 18px 20px;
 }
 @media(max-width:900px) {
+  .org-tree {
+    gap: 32px;
+  }
   .org-level-1,
   .org-level-2 {
     grid-template-columns: 1fr;
+  }
+  .org-node {
+    min-height: auto;
+    padding: 28px 22px 22px;
   }
   .org-level-1::before,
   .org-level-2::before,
