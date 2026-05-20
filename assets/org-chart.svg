@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="520" viewBox="0 0 900 520" aria-labelledby="titleDesc">
+  <title id="titleDesc">IPPAD Organizational Chart</title>
+  <defs>
+    <style>
+      .box{fill:#ffffff;stroke:#1b3f6e;stroke-width:2;rx:8;}
+      .title{font:700 16px/1.2 'Outfit', Arial, sans-serif; fill:#10324a}
+      .role{font:500 14px/1.1 'Outfit', Arial, sans-serif; fill:#10324a}
+      .line{stroke:#1b3f6e;stroke-width:2}
+      .bg{fill:#f7f9fb}
+    </style>
+  </defs>
+  <rect class="bg" x="0" y="0" width="900" height="520" rx="6"/>
+
+  <!-- Board -->
+  <g transform="translate(300,20)">
+    <rect class="box" x="0" y="0" width="300" height="60" rx="8"/>
+    <text x="150" y="28" text-anchor="middle" class="title">Board of Directors</text>
+    <text x="150" y="46" text-anchor="middle" class="role">Governance &amp; Strategy</text>
+  </g>
+
+  <!-- Executive Director -->
+  <g transform="translate(350,110)">
+    <rect class="box" x="0" y="0" width="200" height="56" rx="8"/>
+    <text x="100" y="26" text-anchor="middle" class="title">Executive Director</text>
+    <text x="100" y="44" text-anchor="middle" class="role">Overall Leadership</text>
+  </g>
+
+  <!-- Lines to departments -->
+  <line class="line" x1="400" y1="166" x2="200" y2="240"/>
+  <line class="line" x1="500" y1="166" x2="700" y2="240"/>
+  <line class="line" x1="400" y1="166" x2="400" y2="240"/>
+
+  <!-- Left column -->
+  <g transform="translate(80,240)">
+    <rect class="box" x="0" y="0" width="220" height="56" rx="8"/>
+    <text x="110" y="26" text-anchor="middle" class="title">Programs</text>
+    <text x="110" y="44" text-anchor="middle" class="role">Program Manager(s)</text>
+  </g>
+
+  <!-- Center column -->
+  <g transform="translate(340,240)">
+    <rect class="box" x="0" y="0" width="220" height="56" rx="8"/>
+    <text x="110" y="26" text-anchor="middle" class="title">Operations</text>
+    <text x="110" y="44" text-anchor="middle" class="role">Finance &amp; Admin</text>
+  </g>
+
+  <!-- Right column -->
+  <g transform="translate(600,240)">
+    <rect class="box" x="0" y="0" width="220" height="56" rx="8"/>
+    <text x="110" y="26" text-anchor="middle" class="title">Communications</text>
+    <text x="110" y="44" text-anchor="middle" class="role">Media &amp; Web</text>
+  </g>
+
+  <!-- Bottom row: IT / Volunteers -->
+  <g transform="translate(340,340)">
+    <rect class="box" x="0" y="0" width="220" height="56" rx="8"/>
+    <text x="110" y="26" text-anchor="middle" class="title">IT &amp; Volunteers</text>
+    <text x="110" y="44" text-anchor="middle" class="role">Site Maintenance &amp; Support</text>
+  </g>
+
+  <!-- Connect lines from Executive to columns -->
+  <line class="line" x1="400" y1="166" x2="200" y2="240"/>
+  <line class="line" x1="400" y1="166" x2="460" y2="240"/>
+  <line class="line" x1="400" y1="166" x2="720" y2="240"/>
+
+</svg>
