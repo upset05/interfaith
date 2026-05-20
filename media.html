@@ -322,7 +322,13 @@
       <h2 class="section-title">Our Team &amp; Governance</h2>
       <p class="section-sub">High-level structure showing governance, leadership, and operational teams.</p>
       <div class="org-chart-wrap" style="text-align:center; padding:18px 0 36px;">
-        <img src="assets/org-chart.svg" alt="IPPAD Organizational Chart" style="max-width:100%;height:auto;border:1px solid var(--border);border-radius:8px; background:#fff;">
+        <img id="orgChartImg" src="assets/org-chart.svg" alt="IPPAD Organizational Chart" style="max-width:100%;height:auto;border:1px solid var(--border);border-radius:8px; background:#fff;">
+        <div style="margin-top:12px;display:flex;gap:8px;justify-content:center;align-items:center;">
+          <a class="btn-white-outline" href="assets/org-chart.svg" download="ippad-org-chart.svg">Download SVG</a>
+          <button id="downloadPngBtn" class="btn-gold">Download PNG (High‑Res)</button>
+          <button id="printPdfBtn" class="btn-white-outline">Print / Save as PDF</button>
+        </div>
+        <p id="orgExportMsg" style="color:var(--text-light);font-size:13px;margin-top:8px;">Tip: replace placeholder names in <code>assets/org-chart.svg</code> before exporting.</p>
       </div>
     </div>
 
@@ -403,5 +409,60 @@
 </footer>
 
 <script src="script.js?v=10"></script>
+<script>
+// Client-side export: fetch SVG and render to large canvas for PNG export
+async function exportOrgChartPNG(scale = 3) {
+  const msg = document.getElementById('orgExportMsg');
+  try {
+    msg.innerText = 'Preparing high-resolution PNG...';
+    const res = await fetch('assets/org-chart.svg');
+    const svgText = await res.text();
+    const parser = new DOMParser();
+    const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
+    const svgEl = svgDoc.documentElement;
+
+    // Set desired pixel size
+    const width = 3000;
+    const height = 1800;
+    svgEl.setAttribute('width', width);
+    svgEl.setAttribute('height', height);
+
+    const blob = new Blob([new XMLSerializer().serializeToString(svgEl)], {type: 'image/svg+xml'});
+    const url = URL.createObjectURL(blob);
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = width * scale / 1; // scale multiplier
+      canvas.height = height * scale / 1;
+      const ctx = canvas.getContext('2d');
+      // White background
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0,0,canvas.width,canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      canvas.toBlob(blobOut => {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blobOut);
+        a.download = 'ippad-org-chart.png';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+        msg.innerText = 'PNG downloaded.';
+      }, 'image/png', 0.95);
+    };
+    img.onerror = (e) => {
+      console.error(e);
+      msg.innerText = 'Failed to render PNG.';
+    };
+    img.src = url;
+  } catch (e) {
+    console.error(e);
+    msg.innerText = 'Error exporting PNG.';
+  }
+}
+
+document.getElementById('downloadPngBtn').addEventListener('click', () => exportOrgChartPNG(1));
+document.getElementById('printPdfBtn').addEventListener('click', () => window.print());
+</script>
 </body>
 </html>

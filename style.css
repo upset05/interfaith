@@ -6,6 +6,7 @@
   --blue-light: #2c5fa8;
   --blue-soft: #e8eff9;
   --gold: #c9a227;
+  --gold-contrast: #8f6b0f;
   --gold-light: #e8c84a;
   --white: #fdfcf8;
   --grey: #f5f4f0;
@@ -254,8 +255,8 @@ nav.scrolled{box-shadow:0 2px 24px rgba(0,0,0,.07);}
 .hero-desc{color:rgba(255,255,255,.82);font-size:15.5px;margin-bottom:36px;max-width:440px;position:relative;z-index:1;line-height:1.75;}
 
 .hero-btns{display:flex;gap:14px;flex-wrap:wrap;position:relative;z-index:1;}
-.btn-gold{background:var(--gold);color:#111;border:none;padding:14px 28px;font-size:14px;font-weight:600;border-radius:30px;cursor:pointer;transition:all 0.4s cubic-bezier(0.4, 0, 0.2, 1);text-decoration:none;display:inline-block;letter-spacing:.02em;font-family:'Outfit',sans-serif;}
-.btn-gold:hover{background:var(--gold-light);transform:translateY(-3px);box-shadow:0 12px 24px rgba(201,162,39,0.3);}
+.btn-gold{background:var(--gold-contrast);color:white;border:none;padding:14px 28px;font-size:14px;font-weight:600;border-radius:30px;cursor:pointer;transition:all 0.4s cubic-bezier(0.4, 0, 0.2, 1);text-decoration:none;display:inline-block;letter-spacing:.02em;font-family:'Outfit',sans-serif;}
+.btn-gold:hover{background:#7a560d;transform:translateY(-3px);box-shadow:0 12px 24px rgba(0,0,0,0.12);}
 .btn-white-outline{background:transparent;color:white;border:1.5px solid rgba(255,255,255,0.45);padding:13px 28px;font-size:14px;font-weight:500;border-radius:30px;cursor:pointer;transition:all 0.4s cubic-bezier(0.4, 0, 0.2, 1);font-family:'Outfit',sans-serif;text-decoration:none;display:inline-block;}
 .btn-white-outline:hover{border-color:white;background:rgba(255,255,255,0.1);transform: translateY(-3px);}
 

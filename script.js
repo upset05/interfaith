@@ -778,8 +778,17 @@ function renderGalleryUI() {
         imgWrap.className = 'dynamic-gallery-item';
 
         const img = document.createElement('img');
-        img.alt = "IPPAD Event Photo";
-        img.loading = "lazy";
+        // Derive a helpful alt text from the filename when possible
+        try {
+          const decoded = decodeURIComponent(src);
+          const fileName = decoded.split('/').pop() || decoded;
+          const readable = fileName.replace(/[-_]/g, ' ').replace(/\.[^/.]+$/, '');
+          img.alt = readable ? `IPPAD photo — ${readable}` : 'IPPAD Event Photo';
+        } catch (e) {
+          img.alt = 'IPPAD Event Photo';
+        }
+        img.loading = 'lazy';
+        img.decoding = 'async';
         img.style.width = '100%';
         img.style.height = '100%';
         img.style.objectFit = 'cover';
