@@ -169,7 +169,7 @@ const projectImages = [
 const SUPABASE_URL = "https://jdgzxvwgvmssayobbdrz.supabase.co"; 
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpkZ3p4dndndm1zc2F5b2JiZHJ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkwMTMxMDgsImV4cCI6MjA5NDU4OTEwOH0.2OydMDLfRXz5dT0lrHwk4SVOPJom4wC86FCXDJ5FLzQ";
 
-let supabase = null;
+let supabaseClient = null;
 
 // Initialize Supabase dynamically and wait for the library to be ready
 function initSupabase() {
@@ -251,9 +251,9 @@ function resolveMediaSrc(element, src, property = 'src') {
   }
   
   // If Supabase is active, check if it's a file path to resolve from storage bucket
-  if (supabase) {
+  if (supabaseClient) {
     try {
-      const { data } = supabase.storage.from('images').getPublicUrl(src);
+      const { data } = supabaseClient.storage.from('images').getPublicUrl(src);
       if (data && data.publicUrl) {
         const publicUrl = data.publicUrl;
         if (element) element[property] = publicUrl;
@@ -287,9 +287,9 @@ function handleFileUpload(event, inputId) {
   const filename = file.name;
   
   // If Supabase is active, upload to Supabase Storage Bucket!
-  if (supabase) {
+  if (supabaseClient) {
     showToast(`Uploading "${filename}" to Supabase Cloud Storage...`);
-    supabase.storage.from('images').upload(filename, file, {
+    supabaseClient.storage.from('images').upload(filename, file, {
       cacheControl: '3600',
       upsert: true
     }).then(({ data, error }) => {
@@ -471,8 +471,8 @@ function highlightPicker(gridId, filename) {
 // --- DATA ENGINE MAPPERS ---
 // --- DATA ENGINE MAPPERS ---
 function loadHeroForm() {
-  if (supabase) {
-    supabase.from('hero_content').select('*').eq('id', 'main_hero').single().then(({ data, error }) => {
+  if (supabaseClient) {
+    supabaseClient.from('hero_content').select('*').eq('id', 'main_hero').single().then(({ data, error }) => {
       if (data && !error) {
         document.getElementById('hero_badge').value = data.badge;
         document.getElementById('hero_title').value = data.title;
@@ -503,9 +503,9 @@ function saveHeroContent(event) {
   const desc = document.getElementById('hero_desc').value;
   const photo = document.getElementById('hero_photo_url').value;
 
-  if (supabase) {
+  if (supabaseClient) {
     showToast("Saving to cloud database...");
-    supabase.from('hero_content').upsert([{
+    supabaseClient.from('hero_content').upsert([{
       id: 'main_hero',
       badge,
       title,
@@ -537,7 +537,7 @@ function renderPosts() {
   list.innerHTML = '';
 
   const fetchAction = supabase 
-    ? supabase.from('posts').select('*').order('created_at', { ascending: false }).then(({ data, error }) => {
+    ? supabaseClient.from('posts').select('*').order('created_at', { ascending: false }).then(({ data, error }) => {
         if (error) throw error;
         return data || [];
       })
@@ -586,7 +586,7 @@ function handleAddPost(event) {
   };
 
   const addAction = supabase
-    ? supabase.from('posts').insert([newPost])
+    ? supabaseClient.from('posts').insert([newPost])
     : Promise.resolve().then(() => {
         const posts = JSON.parse(localStorage.getItem('ippad_posts') || '[]');
         posts.unshift(newPost);
@@ -610,7 +610,7 @@ function handleAddPost(event) {
 
 function deletePost(id) {
   const deleteAction = supabase
-    ? supabase.from('posts').delete().eq('id', id)
+    ? supabaseClient.from('posts').delete().eq('id', id)
     : Promise.resolve().then(() => {
         let posts = JSON.parse(localStorage.getItem('ippad_posts') || '[]');
         posts = posts.filter(p => p.id !== id);
@@ -633,7 +633,7 @@ function renderEvents() {
   list.innerHTML = '';
 
   const fetchAction = supabase 
-    ? supabase.from('event_heroes').select('*').order('created_at', { ascending: false }).then(({ data, error }) => {
+    ? supabaseClient.from('event_heroes').select('*').order('created_at', { ascending: false }).then(({ data, error }) => {
         if (error) throw error;
         return data || [];
       })
@@ -682,7 +682,7 @@ function handleAddEvent(event) {
   };
 
   const addAction = supabase
-    ? supabase.from('event_heroes').insert([newEH])
+    ? supabaseClient.from('event_heroes').insert([newEH])
     : Promise.resolve().then(() => {
         const events = JSON.parse(localStorage.getItem('ippad_event_heroes') || '[]');
         events.push(newEH);
@@ -706,7 +706,7 @@ function handleAddEvent(event) {
 
 function deleteEvent(id) {
   const deleteAction = supabase
-    ? supabase.from('event_heroes').delete().eq('id', id)
+    ? supabaseClient.from('event_heroes').delete().eq('id', id)
     : Promise.resolve().then(() => {
         let events = JSON.parse(localStorage.getItem('ippad_event_heroes') || '[]');
         events = events.filter(e => e.id !== id);
@@ -729,7 +729,7 @@ function renderGallery() {
   list.innerHTML = '';
 
   const fetchAction = supabase 
-    ? supabase.from('gallery').select('*').order('created_at', { ascending: false }).then(({ data, error }) => {
+    ? supabaseClient.from('gallery').select('*').order('created_at', { ascending: false }).then(({ data, error }) => {
         if (error) throw error;
         return (data || []).map(item => ({ id: item.id, image_url: item.image_url }));
       })
@@ -781,7 +781,7 @@ function handleAddGallery(event) {
   };
 
   const addAction = supabase
-    ? supabase.from('gallery').insert([newPhoto])
+    ? supabaseClient.from('gallery').insert([newPhoto])
     : Promise.resolve().then(() => {
         const photos = JSON.parse(localStorage.getItem('ippad_gallery') || '[]');
         photos.unshift(url);
@@ -805,7 +805,7 @@ function handleAddGallery(event) {
 
 function deleteGalleryPhoto(id) {
   const deleteAction = supabase
-    ? supabase.from('gallery').delete().eq('id', id)
+    ? supabaseClient.from('gallery').delete().eq('id', id)
     : Promise.resolve().then(() => {
         const photos = JSON.parse(localStorage.getItem('ippad_gallery') || '[]');
         const index = parseInt(id);
@@ -829,7 +829,7 @@ function renderVideos() {
   list.innerHTML = '';
 
   const fetchAction = supabase 
-    ? supabase.from('videos').select('*').order('created_at', { ascending: false }).then(({ data, error }) => {
+    ? supabaseClient.from('videos').select('*').order('created_at', { ascending: false }).then(({ data, error }) => {
         if (error) throw error;
         return data || [];
       })
@@ -888,7 +888,7 @@ function handleAddVideo(event) {
   };
 
   const addAction = supabase
-    ? supabase.from('videos').insert([newV])
+    ? supabaseClient.from('videos').insert([newV])
     : Promise.resolve().then(() => {
         newV.embedUrl = url;
         const videos = JSON.parse(localStorage.getItem('ippad_videos') || '[]');
@@ -912,7 +912,7 @@ function handleAddVideo(event) {
 
 function deleteVideo(id) {
   const deleteAction = supabase
-    ? supabase.from('videos').delete().eq('id', id)
+    ? supabaseClient.from('videos').delete().eq('id', id)
     : Promise.resolve().then(() => {
         let videos = JSON.parse(localStorage.getItem('ippad_videos') || '[]');
         videos = videos.filter(v => v.id !== id);
@@ -998,3 +998,5 @@ window.deleteEvent = deleteEvent;
 window.deleteGalleryPhoto = deleteGalleryPhoto;
 window.deleteVideo = deleteVideo;
 window.handleFileUpload = handleFileUpload;
+
+

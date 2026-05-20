@@ -31,7 +31,7 @@ const sysStorage = {
 const SUPABASE_URL = "https://jdgzxvwgvmssayobbdrz.supabase.co"; 
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpkZ3p4dndndm1zc2F5b2JiZHJ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkwMTMxMDgsImV4cCI6MjA5NDU4OTEwOH0.2OydMDLfRXz5dT0lrHwk4SVOPJom4wC86FCXDJ5FLzQ";
 
-let supabase = null;
+let supabaseClient = null;
 
 // Initialize Supabase dynamically and wait for the library to be ready
 function initSupabase() {
@@ -41,7 +41,7 @@ function initSupabase() {
     const lib = window.supabase;
     if (lib && typeof lib.createClient === 'function') {
       try {
-        supabase = lib.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        supabaseClient = lib.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         console.log("Supabase Client initialized successfully!");
         // Only re-render if DOM is already ready (avoids double render race condition)
         if (document.readyState === 'complete' || document.readyState === 'interactive') {
@@ -147,9 +147,9 @@ function resolveMediaSrc(element, src, property = 'src') {
           return;
         }
         // 3. Try Supabase storage as last resort
-        if (supabase) {
+        if (supabaseClient) {
           try {
-            const { data } = supabase.storage.from('images').getPublicUrl(src);
+            const { data } = supabaseClient.storage.from('images').getPublicUrl(src);
             if (data && data.publicUrl) {
               if (element) element[property] = data.publicUrl;
               resolve(data.publicUrl);
@@ -477,8 +477,8 @@ initSystemData();
 // --- DUAL-MODE DATA ENGINES (SUPABASE + LOCAL STORAGE) ---
 
 function getHeroContent() {
-  if (supabase) {
-    return supabase.from('hero_content').select('*').eq('id', 'main_hero').single().then(({ data, error }) => {
+  if (supabaseClient) {
+    return supabaseClient.from('hero_content').select('*').eq('id', 'main_hero').single().then(({ data, error }) => {
       if (error || !data) return getDefaultHeroLocal();
       return {
         badge: data.badge,
@@ -514,8 +514,8 @@ function safeGetLocalPosts() {
 }
 
 function getPostsList() {
-  if (supabase) {
-    return supabase.from('posts').select('*').order('created_at', { ascending: false }).then(({ data, error }) => {
+  if (supabaseClient) {
+    return supabaseClient.from('posts').select('*').order('created_at', { ascending: false }).then(({ data, error }) => {
       if (error) throw error;
       if (!data || data.length === 0) return safeGetLocalPosts();
       return data;
@@ -539,8 +539,8 @@ function safeGetLocalEventHeroes() {
 }
 
 function getEventHeroesList() {
-  if (supabase) {
-    return supabase.from('event_heroes').select('*').order('created_at', { ascending: false }).then(({ data, error }) => {
+  if (supabaseClient) {
+    return supabaseClient.from('event_heroes').select('*').order('created_at', { ascending: false }).then(({ data, error }) => {
       if (error) throw error;
       if (!data || data.length === 0) return safeGetLocalEventHeroes();
       return data;
@@ -568,8 +568,8 @@ function safeGetLocalGallery() {
 }
 
 function getGalleryPhotosList() {
-  if (supabase) {
-    return supabase.from('gallery').select('*').then(({ data, error }) => {
+  if (supabaseClient) {
+    return supabaseClient.from('gallery').select('*').then(({ data, error }) => {
       if (error) {
         console.error('Supabase gallery fetch error:', error);
         throw error;
@@ -603,8 +603,8 @@ function safeGetLocalVideos() {
 }
 
 function getVideosList() {
-  if (supabase) {
-    return supabase.from('videos').select('*').order('created_at', { ascending: false }).then(({ data, error }) => {
+  if (supabaseClient) {
+    return supabaseClient.from('videos').select('*').order('created_at', { ascending: false }).then(({ data, error }) => {
       if (error) throw error;
       if (!data || data.length === 0) return safeGetLocalVideos();
       return data.map(v => ({
@@ -936,7 +936,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Wait for Supabase to initialize, then render content
   const waitForSupabase = setInterval(() => {
-    if (supabase) {
+    if (supabaseClient) {
       clearInterval(waitForSupabase);
       initLiveUpdates();
     }
@@ -964,3 +964,4 @@ function applyTimeBasedTheme() {
 }
 // Run on interval to keep theme in sync (initial call moved to DOMContentLoaded)
 setInterval(applyTimeBasedTheme, 60000);
+
