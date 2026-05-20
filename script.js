@@ -568,17 +568,24 @@ function safeGetLocalGallery() {
 function getGalleryPhotosList() {
   if (supabase) {
     return supabase.from('gallery').select('*').then(({ data, error }) => {
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase gallery fetch error:', error);
+        throw error;
+      }
+      console.log('Supabase gallery data:', data); // Debug log
       const cloudUrls = (data || []).map(item => item.image_url).filter(url => url);
+      console.log('Cloud URLs extracted:', cloudUrls.length, cloudUrls.slice(0, 3)); // Debug log
       
       // Combine new cloud photos with local photo names
       const allPhotos = [...cloudUrls, ...(defaultGalleryImages || [])];
+      console.log('Total photos (cloud + local):', allPhotos.length); // Debug log
       return allPhotos.filter(photo => photo); // Filter out any falsy values
     }).catch(err => {
       console.warn("Supabase fetch gallery failed, fallback to local storage:", err);
       return safeGetLocalGallery();
     });
   }
+  console.log('Supabase not initialized, using local gallery'); // Debug log
   return Promise.resolve(safeGetLocalGallery());
 }
 
@@ -750,8 +757,12 @@ function renderGalleryUI() {
   if (!dynamicGallery) return;
 
   getGalleryPhotosList().then(galleryImages => {
+    console.log('Gallery photos fetched:', galleryImages.length, galleryImages.slice(0, 5)); // Debug log
+    
     // Filter out any null/undefined and ensure we have valid image names
     const validImages = (galleryImages || []).filter(img => img && img.trim());
+    
+    console.log('Valid gallery images:', validImages.length); // Debug log
     
     const BATCH_SIZE = 15;
     let currentIndex = 0;
@@ -759,7 +770,9 @@ function renderGalleryUI() {
     function renderBatch() {
       const nextBatch = validImages.slice(currentIndex, currentIndex + BATCH_SIZE);
       
-      nextBatch.forEach(src => {
+      console.log(`Rendering batch: ${currentIndex} to ${currentIndex + BATCH_SIZE}, batch size: ${nextBatch.length}`); // Debug log
+      
+      nextBatch.forEach((src, idx) => {
         const imgWrap = document.createElement('div');
         imgWrap.className = 'dynamic-gallery-item';
 
@@ -776,7 +789,9 @@ function renderGalleryUI() {
         img.src = encodedSrc;
         
         // Also call resolveMediaSrc for additional fallback handling
-        resolveMediaSrc(img, src);
+        resolveMediaSrc(img, src).then(resolvedSrc => {
+          console.log(`Image ${idx} resolved to:`, resolvedSrc.substring(0, 50)); // Debug log
+        });
 
         imgWrap.appendChild(img);
         dynamicGallery.appendChild(imgWrap);
@@ -816,6 +831,11 @@ function renderGalleryUI() {
           newBtn.disabled = false;
         }, 400);
       });
+    }
+  }).catch(err => {
+    console.error('Failed to fetch gallery photos:', err);
+    if (dynamicGallery) {
+      dynamicGallery.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-light); padding: 40px 0;">Error loading gallery.</p>';
     }
   });
 }
@@ -904,8 +924,6 @@ function initLiveUpdates() {
 
 // Populate Gallery, Videos, Posts, bind hamburger
 document.addEventListener('DOMContentLoaded', () => {
-  initLiveUpdates();
-
   // Apply dark mode immediately on DOM ready
   applyTimeBasedTheme();
 
@@ -913,6 +931,20 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.hamburger').forEach(btn => {
     btn.addEventListener('click', toggleMenu);
   });
+
+  // Wait for Supabase to initialize, then render content
+  const waitForSupabase = setInterval(() => {
+    if (supabase) {
+      clearInterval(waitForSupabase);
+      initLiveUpdates();
+    }
+  }, 50);
+
+  // Failsafe: render after 2 seconds even if Supabase isn't ready
+  setTimeout(() => {
+    clearInterval(waitForSupabase);
+    initLiveUpdates();
+  }, 2000);
 });
 
 // Keep as global fallback in case any page still has onclick="toggleMenu()"
