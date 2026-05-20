@@ -365,11 +365,17 @@
 
 <script src="script.js?v=9"></script>
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    if (window.lucide && typeof lucide.replace === 'function') {
+  function initLucideIcons() {
+    if (!window.lucide) return;
+    if (typeof lucide.replace === 'function') {
       lucide.replace();
     }
-  });
+    if (typeof lucide.createIcons === 'function') {
+      lucide.createIcons();
+    }
+  }
+  document.addEventListener('DOMContentLoaded', initLucideIcons);
+  window.addEventListener('load', initLucideIcons);
 </script>
 </body>
 </html>
