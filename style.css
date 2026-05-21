@@ -500,8 +500,47 @@ nav.scrolled{box-shadow:0 2px 24px rgba(0,0,0,.07);}
   .dynamic-gallery{ column-count: 2; }
 }
 @media(max-width: 600px){
-  .dynamic-gallery{ column-count: 1; }
+  /* Show two columns on small/mobile devices for denser gallery rows */
+  .dynamic-gallery{ column-count: 2; }
 }
+
+/* SKELETON LOADING STATE */
+body.loading .dynamic-gallery-item,
+body.loading .event-card,
+body.loading .card,
+body.loading .founder-card {
+  background: linear-gradient(90deg, #f3f3f3 0%, #ececec 50%, #f3f3f3 100%);
+  background-size: 200% 100%;
+  animation: skeletonShimmer 1.2s linear infinite;
+  color: transparent !important;
+}
+
+body.loading .dynamic-gallery-item img,
+body.loading .event-card img,
+body.loading .card img,
+body.loading .founder-card img {
+  visibility: hidden;
+}
+
+@keyframes skeletonShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Remove loading state quickly once JS clears it */
+.no-js body.loading { display: block; }
+
+/* Skeleton overlay structure (used by script.js) */
+#skeletonOverlay{
+  position:fixed;inset:0;pointer-events:none;z-index:900;display:flex;flex-direction:column;gap:18px;padding:80px 20px;background:transparent;
+}
+#skeletonOverlay .sk-hero{height:160px;border-radius:12px;background:linear-gradient(90deg,#f3f3f3,#ececec,#f3f3f3);background-size:200% 100%;animation:skeletonShimmer 1.2s linear infinite;width:100%;max-width:1200px;margin:0 auto}
+#skeletonOverlay .sk-row{display:flex;gap:18px;max-width:1200px;margin:0 auto}
+#skeletonOverlay .sk-card{flex:1;height:120px;border-radius:10px;background:linear-gradient(90deg,#f3f3f3,#ececec,#f3f3f3);background-size:200% 100%;animation:skeletonShimmer 1.2s linear infinite}
+#skeletonOverlay .sk-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:1200px;margin:0 auto}
+#skeletonOverlay .sk-thumb{height:120px;border-radius:8px;background:linear-gradient(90deg,#f3f3f3,#ececec,#f3f3f3);background-size:200% 100%;animation:skeletonShimmer 1.2s linear infinite}
+@media(max-width:900px){#skeletonOverlay .sk-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){#skeletonOverlay .sk-grid{grid-template-columns:repeat(2,1fr)}}
 
 #galleryPagination {
   display: flex;

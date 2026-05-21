@@ -937,10 +937,43 @@ function initLiveUpdates() {
   renderVideosUI();
 }
 
+// Skeleton loading overlay
+function showSkeleton() {
+  if (document.getElementById('skeletonOverlay')) return;
+  const overlay = document.createElement('div');
+  overlay.id = 'skeletonOverlay';
+  overlay.setAttribute('aria-hidden','true');
+  overlay.innerHTML = `
+    <div class="sk-hero"></div>
+    <div class="sk-row">
+      <div class="sk-card"></div>
+      <div class="sk-card"></div>
+      <div class="sk-card"></div>
+    </div>
+    <div class="sk-grid">
+      <div class="sk-thumb"></div>
+      <div class="sk-thumb"></div>
+      <div class="sk-thumb"></div>
+      <div class="sk-thumb"></div>
+      <div class="sk-thumb"></div>
+      <div class="sk-thumb"></div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  document.body.classList.add('is-loading');
+}
+
+function hideSkeleton() {
+  const overlay = document.getElementById('skeletonOverlay');
+  if (overlay) overlay.remove();
+  document.body.classList.remove('is-loading');
+  document.body.classList.remove('loading');
+}
+
 // Populate Gallery, Videos, Posts, bind hamburger
 document.addEventListener('DOMContentLoaded', () => {
-  // Apply dark mode immediately on DOM ready
-  applyTimeBasedTheme();
+  // Show skeleton overlay while content initializes
+  showSkeleton();
 
   // Bind hamburger buttons via JS (reliable on all hosts — no inline onclick needed)
   document.querySelectorAll('.hamburger').forEach(btn => {
@@ -952,6 +985,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (supabaseClient) {
       clearInterval(waitForSupabase);
       initLiveUpdates();
+      // remove skeleton after initial render
+      setTimeout(hideSkeleton, 600);
     }
   }, 50);
 
@@ -959,22 +994,12 @@ document.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => {
     clearInterval(waitForSupabase);
     initLiveUpdates();
+    setTimeout(hideSkeleton, 600);
   }, 2000);
 });
 
 // Keep as global fallback in case any page still has onclick="toggleMenu()"
 window.toggleMenu = toggleMenu;
 
-// --- DYNAMIC DARK MODE ---
-function applyTimeBasedTheme() {
-  const hour = new Date().getHours();
-  // Dark mode between 18:00 (6 PM) and 6:00 (6 AM)
-  if (hour >= 18 || hour < 6) {
-    document.body.classList.add('dark-mode');
-  } else {
-    document.body.classList.remove('dark-mode');
-  }
-}
-// Run on interval to keep theme in sync (initial call moved to DOMContentLoaded)
-setInterval(applyTimeBasedTheme, 60000);
+// Night-mode removed: automatic time-based theme has been disabled per request.
 
