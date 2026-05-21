@@ -944,19 +944,60 @@ function showSkeleton() {
   overlay.id = 'skeletonOverlay';
   overlay.setAttribute('aria-hidden','true');
   overlay.innerHTML = `
-    <div class="sk-hero"></div>
-    <div class="sk-row">
-      <div class="sk-card"></div>
-      <div class="sk-card"></div>
-      <div class="sk-card"></div>
+    <div class="sk-nav">
+      <div class="sk-nav-brand">
+        <div class="sk-nav-logo sk-shimmer-bg"></div>
+        <div class="sk-nav-text">
+          <div class="sk-nav-line-1 sk-shimmer-bg"></div>
+          <div class="sk-nav-line-2 sk-shimmer-bg"></div>
+        </div>
+      </div>
+      <div class="sk-nav-links">
+        <div class="sk-nav-link sk-shimmer-bg"></div>
+        <div class="sk-nav-link sk-shimmer-bg"></div>
+        <div class="sk-nav-link sk-shimmer-bg"></div>
+        <div class="sk-nav-link sk-shimmer-bg"></div>
+        <div class="sk-nav-cta sk-shimmer-bg"></div>
+      </div>
+      <div class="sk-nav-hamburger sk-shimmer-bg"></div>
     </div>
-    <div class="sk-grid">
-      <div class="sk-thumb"></div>
-      <div class="sk-thumb"></div>
-      <div class="sk-thumb"></div>
-      <div class="sk-thumb"></div>
-      <div class="sk-thumb"></div>
-      <div class="sk-thumb"></div>
+    <div class="sk-hero">
+      <div class="sk-hero-left">
+        <div class="sk-hero-badge sk-shimmer-bg"></div>
+        <div class="sk-hero-title sk-shimmer-bg"></div>
+        <div class="sk-hero-desc sk-shimmer-bg"></div>
+        <div class="sk-hero-buttons">
+          <div class="sk-hero-btn sk-shimmer-bg"></div>
+          <div class="sk-hero-btn sk-shimmer-bg"></div>
+        </div>
+      </div>
+      <div class="sk-hero-right">
+        <div class="sk-hero-circle sk-shimmer-bg"></div>
+        <div class="sk-hero-card sk-shimmer-bg"></div>
+      </div>
+    </div>
+    <div class="sk-section">
+      <div class="sk-section-header">
+        <div class="sk-section-title sk-shimmer-bg"></div>
+        <div class="sk-section-subtitle sk-shimmer-bg"></div>
+      </div>
+      <div class="sk-grid-3">
+        <div class="sk-card-item">
+          <div class="sk-card-img sk-shimmer-bg"></div>
+          <div class="sk-card-title sk-shimmer-bg"></div>
+          <div class="sk-card-desc sk-shimmer-bg"></div>
+        </div>
+        <div class="sk-card-item">
+          <div class="sk-card-img sk-shimmer-bg"></div>
+          <div class="sk-card-title sk-shimmer-bg"></div>
+          <div class="sk-card-desc sk-shimmer-bg"></div>
+        </div>
+        <div class="sk-card-item">
+          <div class="sk-card-img sk-shimmer-bg"></div>
+          <div class="sk-card-title sk-shimmer-bg"></div>
+          <div class="sk-card-desc sk-shimmer-bg"></div>
+        </div>
+      </div>
     </div>
   `;
   document.body.appendChild(overlay);
@@ -965,7 +1006,18 @@ function showSkeleton() {
 
 function hideSkeleton() {
   const overlay = document.getElementById('skeletonOverlay');
-  if (overlay) overlay.remove();
+  if (overlay) {
+    overlay.classList.add('fade-out');
+    overlay.addEventListener('transitionend', () => {
+      overlay.remove();
+    }, { once: true });
+    // Failsafe in case transitionend doesn't fire
+    setTimeout(() => {
+      if (overlay.parentNode) {
+        overlay.remove();
+      }
+    }, 600);
+  }
   document.body.classList.remove('is-loading');
   document.body.classList.remove('loading');
 }

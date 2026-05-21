@@ -23,11 +23,71 @@
 
 <link rel="icon" type="image/jpeg" href="logo.jpeg">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="style.css?v=5">
+<link rel="stylesheet" href="style.css?v=6">
+<noscript><style>#skeletonOverlay { display: none !important; }</style></noscript>
 <script defer src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/lucide.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 </head>
 <body>
+
+<!-- SKELETON LOADER OVERLAY -->
+<div id="skeletonOverlay" aria-hidden="true">
+  <div class="sk-nav">
+    <div class="sk-nav-brand">
+      <div class="sk-nav-logo sk-shimmer-bg"></div>
+      <div class="sk-nav-text">
+        <div class="sk-nav-line-1 sk-shimmer-bg"></div>
+        <div class="sk-nav-line-2 sk-shimmer-bg"></div>
+      </div>
+    </div>
+    <div class="sk-nav-links">
+      <div class="sk-nav-link sk-shimmer-bg"></div>
+      <div class="sk-nav-link sk-shimmer-bg"></div>
+      <div class="sk-nav-link sk-shimmer-bg"></div>
+      <div class="sk-nav-link sk-shimmer-bg"></div>
+      <div class="sk-nav-cta sk-shimmer-bg"></div>
+    </div>
+    <div class="sk-nav-hamburger sk-shimmer-bg"></div>
+  </div>
+  <div class="sk-hero">
+    <div class="sk-hero-left">
+      <div class="sk-hero-badge sk-shimmer-bg"></div>
+      <div class="sk-hero-title sk-shimmer-bg"></div>
+      <div class="sk-hero-desc sk-shimmer-bg"></div>
+      <div class="sk-hero-buttons">
+        <div class="sk-hero-btn sk-shimmer-bg"></div>
+        <div class="sk-hero-btn sk-shimmer-bg"></div>
+      </div>
+    </div>
+    <div class="sk-hero-right">
+      <div class="sk-hero-circle sk-shimmer-bg"></div>
+      <div class="sk-hero-card sk-shimmer-bg"></div>
+    </div>
+  </div>
+  <div class="sk-section">
+    <div class="sk-section-header">
+      <div class="sk-section-title sk-shimmer-bg"></div>
+      <div class="sk-section-subtitle sk-shimmer-bg"></div>
+    </div>
+    <div class="sk-grid-3">
+      <div class="sk-card-item">
+        <div class="sk-card-img sk-shimmer-bg"></div>
+        <div class="sk-card-title sk-shimmer-bg"></div>
+        <div class="sk-card-desc sk-shimmer-bg"></div>
+      </div>
+      <div class="sk-card-item">
+        <div class="sk-card-img sk-shimmer-bg"></div>
+        <div class="sk-card-title sk-shimmer-bg"></div>
+        <div class="sk-card-desc sk-shimmer-bg"></div>
+      </div>
+      <div class="sk-card-item">
+        <div class="sk-card-img sk-shimmer-bg"></div>
+        <div class="sk-card-title sk-shimmer-bg"></div>
+        <div class="sk-card-desc sk-shimmer-bg"></div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- NAV -->
 <nav id="mainNav">
@@ -265,7 +325,7 @@
   </div>
 </footer>
 
-<script src="script.js?v=9"></script>
+<script src="script.js?v=10"></script>
 <script>
   function initLucideIcons() {
     if (!window.lucide) return;

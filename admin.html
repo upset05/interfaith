@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>IPPAD Admin Portal — Manage Content</title>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet"/>
+<noscript><style>#skeletonOverlay { display: none !important; }</style></noscript>
 <script defer src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/lucide.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
@@ -739,9 +740,166 @@ header {
   .picker-grid { grid-template-columns: repeat(3, 1fr) !important; }
   .picker-item img { height: 60px; }
 }
+
+/* SKELETON LOADER OVERLAY */
+:root {
+  --sk-bg: #ecebec;
+  --sk-highlight: #f8f7f4;
+}
+.sk-shimmer-bg {
+  background: linear-gradient(90deg, var(--sk-bg) 25%, var(--sk-highlight) 50%, var(--sk-bg) 75%);
+  background-size: 200% 100%;
+  animation: skeletonShimmer 1.5s infinite linear;
+}
+@keyframes skeletonShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+#skeletonOverlay {
+  position: fixed;
+  inset: 0;
+  background: var(--white);
+  z-index: 9999;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1), visibility 0.4s;
+  overflow: hidden;
+  pointer-events: all;
+}
+#skeletonOverlay.fade-out {
+  opacity: 0;
+  visibility: hidden;
+}
+.sk-admin-layout {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+}
+.sk-admin-sidebar {
+  width: 260px;
+  background: #ffffff;
+  border-right: 1px solid var(--border);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.sk-admin-logo {
+  width: 140px;
+  height: 40px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+}
+.sk-admin-menu-item {
+  width: 100%;
+  height: 40px;
+  border-radius: 8px;
+}
+.sk-admin-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--grey);
+}
+.sk-admin-header {
+  height: 70px;
+  background: #ffffff;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40px;
+}
+.sk-admin-title {
+  width: 200px;
+  height: 24px;
+  border-radius: 4px;
+}
+.sk-admin-user {
+  width: 120px;
+  height: 36px;
+  border-radius: 18px;
+}
+.sk-admin-body {
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  overflow-y: auto;
+}
+.sk-admin-row-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+.sk-admin-stat-card {
+  height: 120px;
+  border-radius: 12px;
+}
+.sk-admin-table-container {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.sk-admin-table-header {
+  width: 100%;
+  height: 32px;
+  border-radius: 4px;
+}
+.sk-admin-table-row {
+  width: 100%;
+  height: 48px;
+  border-radius: 6px;
+}
+@media (max-width: 900px) {
+  .sk-admin-sidebar {
+    display: none;
+  }
+  .sk-admin-row-grid {
+    grid-template-columns: 1fr;
+  }
+}
 </style>
 </head>
 <body>
+
+<!-- SKELETON LOADER OVERLAY -->
+<div id="skeletonOverlay" aria-hidden="true">
+  <div class="sk-admin-layout">
+    <div class="sk-admin-sidebar">
+      <div class="sk-admin-logo sk-shimmer-bg"></div>
+      <div class="sk-admin-menu-item sk-shimmer-bg"></div>
+      <div class="sk-admin-menu-item sk-shimmer-bg"></div>
+      <div class="sk-admin-menu-item sk-shimmer-bg"></div>
+      <div class="sk-admin-menu-item sk-shimmer-bg"></div>
+      <div class="sk-admin-menu-item sk-shimmer-bg"></div>
+    </div>
+    <div class="sk-admin-main">
+      <div class="sk-admin-header">
+        <div class="sk-admin-title sk-shimmer-bg"></div>
+        <div class="sk-admin-user sk-shimmer-bg"></div>
+      </div>
+      <div class="sk-admin-body">
+        <div class="sk-admin-row-grid">
+          <div class="sk-admin-stat-card sk-shimmer-bg"></div>
+          <div class="sk-admin-stat-card sk-shimmer-bg"></div>
+          <div class="sk-admin-stat-card sk-shimmer-bg"></div>
+        </div>
+        <div class="sk-admin-table-container">
+          <div class="sk-admin-table-header sk-shimmer-bg"></div>
+          <div class="sk-admin-table-row sk-shimmer-bg"></div>
+          <div class="sk-admin-table-row sk-shimmer-bg"></div>
+          <div class="sk-admin-table-row sk-shimmer-bg"></div>
+          <div class="sk-admin-table-row sk-shimmer-bg"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- LOGIN OVERLAY -->
 <div class="login-overlay" id="loginOverlay">
@@ -1584,6 +1742,18 @@ window.onload = function() {
   
   // Initialize Lucide icons
   if (window.lucide) lucide.createIcons();
+
+  // Fade out skeleton overlay
+  const overlay = document.getElementById('skeletonOverlay');
+  if (overlay) {
+    overlay.classList.add('fade-out');
+    overlay.addEventListener('transitionend', () => {
+      overlay.remove();
+    }, { once: true });
+    setTimeout(() => {
+      if (overlay.parentNode) overlay.remove();
+    }, 600);
+  }
 };
 
 // --- TAB ROUTER ---
