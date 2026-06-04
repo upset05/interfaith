@@ -1098,6 +1098,25 @@ document.addEventListener('DOMContentLoaded', () => {
       submitAction
         .then(({ error } = {}) => {
           if (error) throw error;
+          
+          // Send background email notification via FormSubmit.co (non-blocking)
+          fetch("https://formsubmit.co/ajax/imamsandpastorsforum@gmail.com", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Accept": "application/json"
+            },
+            body: JSON.stringify({
+              "Name": name,
+              "Organisation": org || "N/A",
+              "Email": email,
+              "Phone": phone || "N/A",
+              "Subject": subject,
+              "Message": message,
+              "_subject": `IPPAD Forum: New ${subject} from ${name}`
+            })
+          }).catch(err => console.warn("Email notification forward failed:", err));
+
           statusDiv.style.color = '#10b981'; // green
           statusDiv.textContent = 'Thank you! Your message has been sent successfully.';
           contactForm.reset();
