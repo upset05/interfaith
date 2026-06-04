@@ -122,3 +122,45 @@ ON CONFLICT (id) DO UPDATE SET
   motto = EXCLUDED.motto,
   description = EXCLUDED.description,
   photo_url = EXCLUDED.photo_url;
+
+-- 9. Create Contact Requests / Messages Table
+CREATE TABLE IF NOT EXISTS requests (
+  id TEXT PRIMARY KEY,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  name TEXT NOT NULL,
+  organisation TEXT,
+  email TEXT NOT NULL,
+  phone TEXT,
+  subject TEXT NOT NULL,
+  message TEXT NOT NULL,
+  status TEXT DEFAULT 'pending' NOT NULL
+);
+
+-- 10. Create Newsletter Subscriptions Table
+CREATE TABLE IF NOT EXISTS subscriptions (
+  id TEXT PRIMARY KEY,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  email TEXT NOT NULL UNIQUE
+);
+
+-- 11. Enable Row Level Security on new tables
+ALTER TABLE requests ENABLE ROW LEVEL SECURITY;
+ALTER TABLE subscriptions ENABLE ROW LEVEL SECURITY;
+
+-- 12. Policies for Requests Table (Allow public anon inserts, reads, updates, and deletes)
+DROP POLICY IF EXISTS "Allow public select on requests" ON requests;
+DROP POLICY IF EXISTS "Allow anon insert on requests" ON requests;
+DROP POLICY IF EXISTS "Allow anon update on requests" ON requests;
+DROP POLICY IF EXISTS "Allow anon delete on requests" ON requests;
+CREATE POLICY "Allow public select on requests" ON requests FOR SELECT USING (true);
+CREATE POLICY "Allow anon insert on requests" ON requests FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow anon update on requests" ON requests FOR UPDATE USING (true);
+CREATE POLICY "Allow anon delete on requests" ON requests FOR DELETE USING (true);
+
+-- 13. Policies for Subscriptions Table (Allow public anon inserts, reads, and deletes)
+DROP POLICY IF EXISTS "Allow public select on subscriptions" ON subscriptions;
+DROP POLICY IF EXISTS "Allow anon insert on subscriptions" ON subscriptions;
+DROP POLICY IF EXISTS "Allow anon delete on subscriptions" ON subscriptions;
+CREATE POLICY "Allow public select on subscriptions" ON subscriptions FOR SELECT USING (true);
+CREATE POLICY "Allow anon insert on subscriptions" ON subscriptions FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow anon delete on subscriptions" ON subscriptions FOR DELETE USING (true);

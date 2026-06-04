@@ -1048,6 +1048,152 @@ document.addEventListener('DOMContentLoaded', () => {
     initLiveUpdates();
     setTimeout(hideSkeleton, 600);
   }, 2000);
+
+  // --- SUBMISSIONS HANDLERS ---
+  const contactForm = document.getElementById('contactForm');
+  if (contactForm) {
+    contactForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      const statusDiv = document.getElementById('contactStatus');
+      const name = document.getElementById('contactName').value.trim();
+      const org = document.getElementById('contactOrg').value.trim();
+      const email = document.getElementById('contactEmail').value.trim();
+      const phone = document.getElementById('contactPhone').value.trim();
+      const subject = document.getElementById('contactSubject').value;
+      const message = document.getElementById('contactMessage').value.trim();
+      
+      if (!name || !email || !subject || !message) {
+        statusDiv.style.color = '#d93838'; // red
+        statusDiv.textContent = 'Please fill in all required fields.';
+        return;
+      }
+      
+      const btn = contactForm.querySelector('button[type="submit"]');
+      const originalText = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = 'Sending...';
+      statusDiv.textContent = '';
+      
+      const newRequest = {
+        id: 'req_' + Date.now(),
+        created_at: new Date().toISOString(),
+        name: name,
+        organisation: org || null,
+        email: email,
+        phone: phone || null,
+        subject: subject,
+        message: message,
+        status: 'pending'
+      };
+      
+      const submitAction = supabaseClient
+        ? supabaseClient.from('requests').insert([newRequest])
+        : Promise.resolve().then(() => {
+            const requests = JSON.parse(sysStorage.getItem('ippad_requests') || '[]');
+            requests.unshift(newRequest);
+            sysStorage.setItem('ippad_requests', JSON.stringify(requests));
+          });
+          
+      submitAction
+        .then(({ error } = {}) => {
+          if (error) throw error;
+          statusDiv.style.color = '#10b981'; // green
+          statusDiv.textContent = 'Thank you! Your message has been sent successfully.';
+          contactForm.reset();
+        })
+        .catch(err => {
+          console.error(err);
+          statusDiv.style.color = '#d93838'; // red
+          statusDiv.textContent = 'Failed to send message. Please try again.';
+        })
+        .finally(() => {
+          btn.disabled = false;
+          btn.innerHTML = originalText;
+        });
+    });
+  }
+
+  const newsletterForm = document.getElementById('newsletterForm');
+  if (newsletterForm) {
+    newsletterForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      const statusDiv = document.getElementById('newsletterStatus');
+      const email = document.getElementById('newsletterEmail').value.trim();
+      
+      if (!email) return;
+      
+      const btn = newsletterForm.querySelector('button[type="submit"]');
+      const originalText = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = 'Subscribing...';
+      statusDiv.textContent = '';
+      
+      const newSub = {
+        id: 'sub_' + Date.now(),
+        created_at: new Date().toISOString(),
+        email: email
+      };
+      
+      const submitAction = supabaseClient
+        ? supabaseClient.from('subscriptions').insert([newSub])
+        : Promise.resolve().then(() => {
+            const subs = JSON.parse(sysStorage.getItem('ippad_subscriptions') || '[]');
+            // Check for duplicates in local storage fallback
+            if (!subs.some(s => s.email.toLowerCase() === email.toLowerCase())) {
+              subs.unshift(newSub);
+              sysStorage.setItem('ippad_subscriptions', JSON.stringify(subs));
+            }
+          });
+          
+      submitAction
+        .then(({ error } = {}) => {
+          if (error) {
+            // Check for unique key constraint error in Supabase
+            if (error.code === '23505') {
+              statusDiv.style.color = '#ffdd57'; // gold
+              statusDiv.textContent = 'This email is already subscribed!';
+              return;
+            }
+            throw error;
+          }
+          statusDiv.style.color = '#ffffff'; // white
+          statusDiv.textContent = 'Successfully subscribed!';
+          newsletterForm.reset();
+        })
+        .catch(err => {
+          console.error(err);
+          statusDiv.style.color = '#ffdd57'; // gold
+          statusDiv.textContent = 'Subscription failed. Please try again.';
+        })
+        .finally(() => {
+          btn.disabled = false;
+          btn.innerHTML = originalText;
+        });
+    });
+  }
+
+  // --- GET INVOLVED CARDS INTERACTION ---
+  document.querySelectorAll('.get-involved-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const subject = card.getAttribute('data-subject');
+      const select = document.getElementById('contactSubject');
+      const form = document.getElementById('contactForm');
+      
+      if (select && form) {
+        select.value = subject;
+        form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        
+        // Add a temporary subtle highlight animation to the form
+        form.style.transition = 'outline 0.3s ease';
+        form.style.outline = '3px solid var(--green)';
+        setTimeout(() => {
+          form.style.outline = 'none';
+        }, 1200);
+      }
+    });
+  });
 });
 
 // Keep as global fallback in case any page still has onclick="toggleMenu()"

@@ -266,9 +266,12 @@
   <div class="newsletter-bar">
     <h3>Stay Informed</h3>
     <p>Receive updates on our programs, events, and publications in your inbox.</p>
-    <div class="newsletter-form">
-      <input type="email" placeholder="Your email address"/>
-      <button>Subscribe</button>
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+      <form class="newsletter-form" id="newsletterForm" onsubmit="return false;">
+        <input type="email" id="newsletterEmail" placeholder="Your email address" required/>
+        <button type="submit">Subscribe</button>
+      </form>
+      <div id="newsletterStatus" style="font-size: 13px; font-weight: 500; text-align: left; margin-left: 4px; min-height: 18px;"></div>
     </div>
   </div>
 </div>

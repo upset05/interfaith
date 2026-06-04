@@ -863,6 +863,66 @@ header {
     grid-template-columns: 1fr;
   }
 }
+
+/* Requests & Subscriptions Panel Styling */
+.badge-status-pending {
+  background-color: #fef3c7 !important;
+  color: #d97706 !important;
+}
+.badge-status-contacted {
+  background-color: #dbeafe !important;
+  color: #2563eb !important;
+}
+.badge-status-resolved {
+  background-color: #d1fae5 !important;
+  color: #059669 !important;
+}
+.filter-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.filter-tab-btn {
+  background: var(--grey);
+  border: 1px solid var(--border);
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--text-dark);
+  font-family: 'Outfit', sans-serif;
+}
+.filter-tab-btn.active {
+  background: var(--green);
+  color: white;
+  border-color: var(--green);
+}
+.admin-split-layout {
+  display: grid;
+  grid-template-columns: 1.8fr 1.2fr;
+  gap: 30px;
+}
+@media (max-width: 900px) {
+  .admin-split-layout {
+    grid-template-columns: 1fr;
+  }
+}
+.subscribers-list {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+.subscriber-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.subscriber-item:last-child {
+  border-bottom: none;
+}
 </style>
 </head>
 <body>
@@ -872,6 +932,7 @@ header {
   <div class="sk-admin-layout">
     <div class="sk-admin-sidebar">
       <div class="sk-admin-logo sk-shimmer-bg"></div>
+      <div class="sk-admin-menu-item sk-shimmer-bg"></div>
       <div class="sk-admin-menu-item sk-shimmer-bg"></div>
       <div class="sk-admin-menu-item sk-shimmer-bg"></div>
       <div class="sk-admin-menu-item sk-shimmer-bg"></div>
@@ -1045,6 +1106,11 @@ header {
           <i data-lucide="video"></i> Video Library
         </button>
       </li>
+      <li>
+        <button class="menu-item" onclick="switchTab('tab-requests', this)">
+          <i data-lucide="mail"></i> User Requests &amp; Subs
+        </button>
+      </li>
       <li style="margin-top: 24px; border-top: 1px solid var(--border); padding-top: 16px;">
         <button class="menu-item" onclick="resetDefaults()" style="color: #d93838;">
           <i data-lucide="refresh-cw" style="color: #d93838;"></i> Reset All Defaults
@@ -1161,6 +1227,42 @@ header {
       </div>
       <div class="item-list" id="videosList">
         <!-- Videos list injected here -->
+      </div>
+    </div>
+
+    <!-- TAB 6: USER REQUESTS & NEWSLETTER -->
+    <div class="tab-pane" id="tab-requests">
+      <div class="section-header">
+        <div>
+          <h2>User Requests &amp; Subscriptions</h2>
+          <p>View and manage contact form requests, partnership proposals, membership applications, and newsletter subscriptions.</p>
+        </div>
+      </div>
+      
+      <div class="admin-split-layout">
+        <!-- Left Side: Requests/Messages -->
+        <div>
+          <h3 style="margin-bottom: 14px; font-family:'Playfair Display', serif; font-style:italic;">Contact Messages &amp; Proposals</h3>
+          <div class="filter-tabs">
+            <button class="filter-tab-btn active" onclick="window.filterRequests('all', this)">All</button>
+            <button class="filter-tab-btn" onclick="window.filterRequests('pending', this)">Pending</button>
+            <button class="filter-tab-btn" onclick="window.filterRequests('contacted', this)">Contacted</button>
+            <button class="filter-tab-btn" onclick="window.filterRequests('resolved', this)">Resolved</button>
+          </div>
+          <div class="item-list" id="requestsList">
+            <!-- Contact messages dynamically injected -->
+          </div>
+        </div>
+        
+        <!-- Right Side: Subscribers list -->
+        <div>
+          <h3 style="margin-bottom: 14px; font-family:'Playfair Display', serif; font-style:italic;">Newsletter Subscribers</h3>
+          <div class="subscribers-list">
+            <div id="subscribersListContainer">
+              <!-- Subscribers list dynamically injected -->
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -2330,6 +2432,205 @@ function deleteVideo(id) {
   });
 }
 
+// --- USER REQUESTS & NEWSLETTER SUBSCRIBERS ---
+let activeRequestFilter = 'all';
+
+function filterRequests(filterType, btn) {
+  activeRequestFilter = filterType;
+  document.querySelectorAll('#tab-requests .filter-tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderRequests();
+}
+
+function renderRequests() {
+  const list = document.getElementById('requestsList');
+  if (!list) return;
+  list.innerHTML = '';
+
+  const fetchAction = supabase 
+    ? supabase.from('requests').select('*').order('created_at', { ascending: false }).then(({ data, error }) => {
+        if (error) throw error;
+        return data || [];
+      })
+    : Promise.resolve(JSON.parse(sysStorage.getItem('ippad_requests') || '[]'));
+
+  fetchAction.then(reqs => {
+    const filtered = reqs.filter(r => {
+      if (activeRequestFilter === 'all') return true;
+      return r.status === activeRequestFilter;
+    });
+
+    if (filtered.length === 0) {
+      list.innerHTML = `<p style="color: var(--text-light); text-align: center; padding: 24px;">No messages found under "${activeRequestFilter}" category.</p>`;
+      return;
+    }
+    
+    filtered.forEach(req => {
+      const row = document.createElement('div');
+      row.className = 'item-row';
+      row.style.flexDirection = 'column';
+      row.style.alignItems = 'stretch';
+      row.style.gap = '12px';
+      row.style.padding = '20px';
+      row.style.background = 'var(--white)';
+      row.style.borderRadius = '8px';
+      row.style.border = '1px solid var(--border)';
+      
+      const reqDate = req.created_at ? new Date(req.created_at).toLocaleString() : 'Date Unknown';
+      const statusLabelClass = `badge-status-${req.status || 'pending'}`;
+
+      row.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;">
+          <div>
+            <h4 style="margin: 0; font-size: 15px; color: var(--text-dark);">${req.name}</h4>
+            ${req.organisation ? `<span style="font-size: 12px; color: var(--text-light);">${req.organisation}</span>` : ''}
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <span class="badge ${statusLabelClass}" style="font-weight: 700; padding: 4px 8px; border-radius: 4px; font-size: 11px; text-transform: uppercase; border: none; margin: 0;">
+              ${req.status || 'pending'}
+            </span>
+            <span style="font-size: 11px; color: var(--text-light);">${reqDate}</span>
+          </div>
+        </div>
+        
+        <div style="font-size: 13.5px; background: var(--grey); padding: 12px 16px; border-radius: 6px; border-left: 3px solid var(--green); margin: 4px 0;">
+          <strong style="color: var(--text-dark);">Subject: ${req.subject}</strong>
+          <p style="margin: 6px 0 0 0; color: var(--text-dark); white-space: pre-wrap; font-family: inherit; line-height: 1.4;">${req.message}</p>
+        </div>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px; flex-wrap: wrap; gap: 12px;">
+          <div style="font-size: 13px; display: flex; gap: 16px; color: var(--text-light);">
+            <span>📧 <a href="mailto:${req.email}" style="color: var(--green); text-decoration: none; font-weight: 500;">${req.email}</a></span>
+            ${req.phone ? `<span>📞 <a href="tel:${req.phone}" style="color: var(--green); text-decoration: none; font-weight: 500;">${req.phone}</a></span>` : ''}
+          </div>
+          
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <select onchange="window.updateRequestStatus('${req.id}', this.value)" style="padding: 6px; font-size: 12.5px; border-radius: 4px; border: 1px solid var(--border); font-family: inherit; outline: none; background: var(--white); cursor: pointer;">
+              <option value="pending" ${req.status === 'pending' ? 'selected' : ''}>Pending</option>
+              <option value="contacted" ${req.status === 'contacted' ? 'selected' : ''}>Contacted</option>
+              <option value="resolved" ${req.status === 'resolved' ? 'selected' : ''}>Resolved</option>
+            </select>
+            <button onclick="window.deleteRequest('${req.id}')" class="btn-danger" style="padding: 6px 12px; font-size: 12.5px; margin: 0; display: inline-flex; align-items: center; gap: 4px;"><i data-lucide="trash-2"></i> Delete</button>
+          </div>
+        </div>
+      `;
+      list.appendChild(row);
+    });
+    if (window.lucide) lucide.createIcons();
+  }).catch(err => {
+    console.error(err);
+    list.innerHTML = '<p style="color: red; text-align: center; padding: 24px;">Error fetching messages.</p>';
+  });
+}
+
+function updateRequestStatus(id, newStatus) {
+  const updateAction = supabase
+    ? supabase.from('requests').update({ status: newStatus }).eq('id', id)
+    : Promise.resolve().then(() => {
+        const reqs = JSON.parse(sysStorage.getItem('ippad_requests') || '[]');
+        const idx = reqs.findIndex(r => r.id === id);
+        if (idx !== -1) {
+          reqs[idx].status = newStatus;
+          sysStorage.setItem('ippad_requests', JSON.stringify(reqs));
+        }
+      });
+
+  updateAction.then(({ error } = {}) => {
+    if (error) throw error;
+    showToast("Request status updated successfully!");
+    renderRequests();
+  }).catch(err => {
+    console.error(err);
+    showToast("Error updating status.");
+  });
+}
+
+function deleteRequest(id) {
+  if (!confirm("Are you sure you want to delete this message?")) return;
+
+  const deleteAction = supabase
+    ? supabase.from('requests').delete().eq('id', id)
+    : Promise.resolve().then(() => {
+        const reqs = JSON.parse(sysStorage.getItem('ippad_requests') || '[]');
+        const filtered = reqs.filter(r => r.id !== id);
+        sysStorage.setItem('ippad_requests', JSON.stringify(filtered));
+      });
+
+  deleteAction.then(({ error } = {}) => {
+    if (error) throw error;
+    showToast("Message deleted successfully!");
+    renderRequests();
+  }).catch(err => {
+    console.error(err);
+    showToast("Error deleting message.");
+  });
+}
+
+function renderSubscriptions() {
+  const container = document.getElementById('subscribersListContainer');
+  if (!container) return;
+  container.innerHTML = '';
+
+  const fetchAction = supabase 
+    ? supabase.from('subscriptions').select('*').order('created_at', { ascending: false }).then(({ data, error }) => {
+        if (error) throw error;
+        return data || [];
+      })
+    : Promise.resolve(JSON.parse(sysStorage.getItem('ippad_subscriptions') || '[]'));
+
+  fetchAction.then(subs => {
+    if (subs.length === 0) {
+      container.innerHTML = '<p style="color: var(--text-light); text-align: center; padding: 12px; font-size: 13px;">No subscribers signed up yet.</p>';
+      return;
+    }
+
+    subs.forEach(sub => {
+      const div = document.createElement('div');
+      div.className = 'subscriber-item';
+      const subDate = sub.created_at ? new Date(sub.created_at).toLocaleDateString() : '';
+
+      div.innerHTML = `
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+          <span style="font-weight: 500; font-size: 13.5px; color: var(--text-dark); word-break: break-all;">${sub.email}</span>
+          ${subDate ? `<span style="font-size: 11px; color: var(--text-light);">Signed up: ${subDate}</span>` : ''}
+        </div>
+        <button onclick="window.deleteSubscription('${sub.id}')" class="btn-danger" style="padding: 4px 8px; font-size: 11.5px; margin: 0; line-height: 1; display: inline-flex; align-items: center; gap: 4px;"><i data-lucide="trash-2" style="width:12px;height:12px;"></i></button>
+      `;
+      container.appendChild(div);
+    });
+    if (window.lucide) lucide.createIcons();
+  }).catch(err => {
+    console.error(err);
+    container.innerHTML = '<p style="color: red; text-align: center; padding: 12px; font-size: 12px;">Error fetching list.</p>';
+  });
+}
+
+function deleteSubscription(id) {
+  if (!confirm("Are you sure you want to unsubscribe this email?")) return;
+
+  const deleteAction = supabase
+    ? supabase.from('subscriptions').delete().eq('id', id)
+    : Promise.resolve().then(() => {
+        const subs = JSON.parse(sysStorage.getItem('ippad_subscriptions') || '[]');
+        const filtered = subs.filter(s => s.id !== id);
+        sysStorage.setItem('ippad_subscriptions', JSON.stringify(filtered));
+      });
+
+  deleteAction.then(({ error } = {}) => {
+    if (error) throw error;
+    showToast("Subscriber unsubscribed successfully!");
+    renderSubscriptions();
+  }).catch(err => {
+    console.error(err);
+    showToast("Error removing subscriber.");
+  });
+}
+
+window.filterRequests = filterRequests;
+window.updateRequestStatus = updateRequestStatus;
+window.deleteRequest = deleteRequest;
+window.deleteSubscription = deleteSubscription;
+
 // Reset Database Defaults
 // Bug fix: initSystemData was missing from admin.html (it lives in script.js which admin doesn't load)
 function initSystemData() {
@@ -2401,6 +2702,8 @@ function renderAllContent() {
   renderEvents();
   renderGallery();
   renderVideos();
+  renderRequests();
+  renderSubscriptions();
 }
 
 // --- MODAL ENGINE CONTROLLER ---
