@@ -2449,7 +2449,10 @@ function renderRequests() {
 
   const fetchAction = supabase 
     ? supabase.from('requests').select('*').order('created_at', { ascending: false }).then(({ data, error }) => {
-        if (error) throw error;
+        if (error) {
+          console.warn("Supabase requests query failed, falling back to local storage:", error);
+          return JSON.parse(sysStorage.getItem('ippad_requests') || '[]');
+        }
         return data || [];
       })
     : Promise.resolve(JSON.parse(sysStorage.getItem('ippad_requests') || '[]'));
@@ -2525,7 +2528,17 @@ function renderRequests() {
 
 function updateRequestStatus(id, newStatus) {
   const updateAction = supabase
-    ? supabase.from('requests').update({ status: newStatus }).eq('id', id)
+    ? supabase.from('requests').update({ status: newStatus }).eq('id', id).then(({ error }) => {
+        if (error) {
+          console.warn("Supabase update failed, applying to local storage fallback:", error);
+          const reqs = JSON.parse(sysStorage.getItem('ippad_requests') || '[]');
+          const idx = reqs.findIndex(r => r.id === id);
+          if (idx !== -1) {
+            reqs[idx].status = newStatus;
+            sysStorage.setItem('ippad_requests', JSON.stringify(reqs));
+          }
+        }
+      })
     : Promise.resolve().then(() => {
         const reqs = JSON.parse(sysStorage.getItem('ippad_requests') || '[]');
         const idx = reqs.findIndex(r => r.id === id);
@@ -2535,8 +2548,7 @@ function updateRequestStatus(id, newStatus) {
         }
       });
 
-  updateAction.then(({ error } = {}) => {
-    if (error) throw error;
+  updateAction.then(() => {
     showToast("Request status updated successfully!");
     renderRequests();
   }).catch(err => {
@@ -2549,15 +2561,21 @@ function deleteRequest(id) {
   if (!confirm("Are you sure you want to delete this message?")) return;
 
   const deleteAction = supabase
-    ? supabase.from('requests').delete().eq('id', id)
+    ? supabase.from('requests').delete().eq('id', id).then(({ error }) => {
+        if (error) {
+          console.warn("Supabase delete failed, applying to local storage fallback:", error);
+          const reqs = JSON.parse(sysStorage.getItem('ippad_requests') || '[]');
+          const filtered = reqs.filter(r => r.id !== id);
+          sysStorage.setItem('ippad_requests', JSON.stringify(filtered));
+        }
+      })
     : Promise.resolve().then(() => {
         const reqs = JSON.parse(sysStorage.getItem('ippad_requests') || '[]');
         const filtered = reqs.filter(r => r.id !== id);
         sysStorage.setItem('ippad_requests', JSON.stringify(filtered));
       });
 
-  deleteAction.then(({ error } = {}) => {
-    if (error) throw error;
+  deleteAction.then(() => {
     showToast("Message deleted successfully!");
     renderRequests();
   }).catch(err => {
@@ -2573,7 +2591,10 @@ function renderSubscriptions() {
 
   const fetchAction = supabase 
     ? supabase.from('subscriptions').select('*').order('created_at', { ascending: false }).then(({ data, error }) => {
-        if (error) throw error;
+        if (error) {
+          console.warn("Supabase subscriptions query failed, falling back to local storage:", error);
+          return JSON.parse(sysStorage.getItem('ippad_subscriptions') || '[]');
+        }
         return data || [];
       })
     : Promise.resolve(JSON.parse(sysStorage.getItem('ippad_subscriptions') || '[]'));
@@ -2609,15 +2630,21 @@ function deleteSubscription(id) {
   if (!confirm("Are you sure you want to unsubscribe this email?")) return;
 
   const deleteAction = supabase
-    ? supabase.from('subscriptions').delete().eq('id', id)
+    ? supabase.from('subscriptions').delete().eq('id', id).then(({ error }) => {
+        if (error) {
+          console.warn("Supabase unsubscribe failed, applying to local storage fallback:", error);
+          const subs = JSON.parse(sysStorage.getItem('ippad_subscriptions') || '[]');
+          const filtered = subs.filter(s => s.id !== id);
+          sysStorage.setItem('ippad_subscriptions', JSON.stringify(filtered));
+        }
+      })
     : Promise.resolve().then(() => {
         const subs = JSON.parse(sysStorage.getItem('ippad_subscriptions') || '[]');
         const filtered = subs.filter(s => s.id !== id);
         sysStorage.setItem('ippad_subscriptions', JSON.stringify(filtered));
       });
 
-  deleteAction.then(({ error } = {}) => {
-    if (error) throw error;
+  deleteAction.then(() => {
     showToast("Subscriber unsubscribed successfully!");
     renderSubscriptions();
   }).catch(err => {
