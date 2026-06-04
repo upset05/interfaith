@@ -1843,7 +1843,7 @@ window.onload = function() {
   try { loadHeroForm(); } catch(e) { console.error('loadHeroForm error:', e); }
   
   // Initialize Lucide icons
-  if (window.lucide) lucide.createIcons();
+  try { if (window.lucide) lucide.createIcons(); } catch(e) { console.error('Lucide error:', e); }
 
   // Fade out skeleton overlay
   const overlay = document.getElementById('skeletonOverlay');
@@ -1869,7 +1869,7 @@ function switchTab(tabId, btn) {
   // Auto-close sidebar drawer on mobile when a tab is selected
   if (typeof closeSidebar === 'function') closeSidebar();
 
-  if (window.lucide) lucide.createIcons();
+  try { if (window.lucide) lucide.createIcons(); } catch(e) { console.error('Lucide error:', e); }
 }
 
 // --- MOCK IMAGE PICKER GENERATOR ---
@@ -2041,7 +2041,7 @@ function renderPosts() {
       const imgEl = document.getElementById(`post_img_${post.id}`);
       if (imgEl) resolveMediaSrc(imgEl, post.image);
     });
-    if (window.lucide) lucide.createIcons();
+    try { if (window.lucide) lucide.createIcons(); } catch(e) { console.error('Lucide error:', e); }
   }).catch(err => {
     console.error(err);
     list.innerHTML = '<p style="color: red; text-align: center; padding: 24px;">Error fetching news.</p>';
@@ -2137,7 +2137,7 @@ function renderEvents() {
       const imgEl = document.getElementById(`event_img_${eh.id}`);
       if (imgEl) resolveMediaSrc(imgEl, eh.image);
     });
-    if (window.lucide) lucide.createIcons();
+    try { if (window.lucide) lucide.createIcons(); } catch(e) { console.error('Lucide error:', e); }
   }).catch(err => {
     console.error(err);
     list.innerHTML = '<p style="color: red; text-align: center; padding: 24px;">Error fetching events.</p>';
@@ -2237,7 +2237,7 @@ function renderGallery() {
       const imgEl = document.getElementById(`gallery_img_${photo.id}`);
       if (imgEl) resolveMediaSrc(imgEl, photo.image_url);
     });
-    if (window.lucide) lucide.createIcons();
+    try { if (window.lucide) lucide.createIcons(); } catch(e) { console.error('Lucide error:', e); }
   }).catch(err => {
     console.error(err);
     list.innerHTML = '<p style="color: red; text-align: center; padding: 24px; grid-column: 1/-1;">Error loading gallery.</p>';
@@ -2364,7 +2364,7 @@ function renderVideos() {
       `;
       list.appendChild(row);
     });
-    if (window.lucide) lucide.createIcons();
+    try { if (window.lucide) lucide.createIcons(); } catch(e) { console.error('Lucide error:', e); }
   }).catch(err => {
     console.error(err);
     list.innerHTML = '<p style="color: red; text-align: center; padding: 24px;">Error fetching videos.</p>';
@@ -2519,7 +2519,7 @@ function renderRequests() {
       `;
       list.appendChild(row);
     });
-    if (window.lucide) lucide.createIcons();
+    try { if (window.lucide) lucide.createIcons(); } catch(e) { console.error('Lucide error:', e); }
   }).catch(err => {
     console.error(err);
     list.innerHTML = '<p style="color: red; text-align: center; padding: 24px;">Error fetching messages.</p>';
@@ -2619,7 +2619,7 @@ function renderSubscriptions() {
       `;
       container.appendChild(div);
     });
-    if (window.lucide) lucide.createIcons();
+    try { if (window.lucide) lucide.createIcons(); } catch(e) { console.error('Lucide error:', e); }
   }).catch(err => {
     console.error(err);
     container.innerHTML = '<p style="color: red; text-align: center; padding: 12px; font-size: 12px;">Error fetching list.</p>';
