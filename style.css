@@ -16,6 +16,7 @@
   --radius: 6px;
   --nav-bg: rgba(253,252,248,0.97);
   --card-bg: #ffffff;
+  --global-img-scale: 1.0;
 }
 
 body.dark-mode {
@@ -1566,4 +1567,8 @@ footer{background:#0c1a10;color:rgba(255,255,255,.65);padding:56px 80px 28px;}
   object-fit: cover;
   display: block;
 }
+
+
+/* GLOBAL IMAGE SCALE FROM ADMIN */
+img { transform: scale(var(--global-img-scale, 1.0)); transition: transform 0.3s ease; }
 

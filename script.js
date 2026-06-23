@@ -1231,5 +1231,11 @@ document.addEventListener('DOMContentLoaded', () => {
 // Keep as global fallback in case any page still has onclick="toggleMenu()"
 window.toggleMenu = toggleMenu;
 
+// --- GLOBAL DISPLAY SETTINGS ---
+(function applyGlobalSettings() {
+  const scale = sysStorage.getItem('globalImageScale') || '1.0';
+  document.documentElement.style.setProperty('--global-img-scale', scale);
+})();
+
 // Night-mode removed: automatic time-based theme has been disabled per request.
 

@@ -1111,6 +1111,11 @@ header {
           <i data-lucide="mail"></i> User Requests &amp; Subs
         </button>
       </li>
+      <li>
+        <button class="menu-item" onclick="switchTab('tab-settings', this)">
+          <i data-lucide="settings"></i> Global Site Settings
+        </button>
+      </li>
       <li style="margin-top: 24px; border-top: 1px solid var(--border); padding-top: 16px;">
         <button class="menu-item" onclick="resetDefaults()" style="color: #d93838;">
           <i data-lucide="refresh-cw" style="color: #d93838;"></i> Reset All Defaults
@@ -1264,6 +1269,29 @@ header {
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- TAB: SITE SETTINGS -->
+    <div class="tab-pane" id="tab-settings">
+      <div class="section-header">
+        <div>
+          <h2>Global Site Settings</h2>
+          <p>Adjust global display settings like image sizes across the website.</p>
+        </div>
+      </div>
+      <form id="settingsForm" onsubmit="try { saveSettingsContent(event); } catch(e) { console.error(e); } return false;">
+        <div class="input-group">
+          <label for="img_scale_slider">Global Image Zoom Scale (1.0 = Normal, 1.5 = +50% Zoom)</label>
+          <div style="display:flex; align-items:center; gap: 15px;">
+            <input type="range" id="img_scale_slider" min="0.5" max="2.0" step="0.1" value="1.0" style="flex:1;" oninput="document.getElementById('img_scale_val').innerText = this.value + 'x'">
+            <span id="img_scale_val" style="font-weight:bold; min-width: 40px;">1.0x</span>
+          </div>
+          <p style="font-size: 13px; color: var(--text-light); margin-top: 8px;">Increase this value to zoom in on all images, revealing more detail without breaking the layout.</p>
+        </div>
+        <div class="input-group" style="margin-top: 30px;">
+          <button type="submit" class="btn-primary" id="btnSaveSettings">Save Settings</button>
+        </div>
+      </form>
     </div>
 
   </main>
@@ -1868,6 +1896,10 @@ function switchTab(tabId, btn) {
   
   // Auto-close sidebar drawer on mobile when a tab is selected
   if (typeof closeSidebar === 'function') closeSidebar();
+
+  if (tabId === 'tab-settings' && typeof loadSettingsContent === 'function') {
+    loadSettingsContent();
+  }
 
   try { if (window.lucide) lucide.createIcons(); } catch(e) { console.error('Lucide error:', e); }
 }
@@ -2756,6 +2788,35 @@ function showToast(text) {
     toast.classList.remove('show');
   }, 3500);
 }
+
+// --- GLOBAL SETTINGS LOGIC ---
+function loadSettingsContent() {
+  const el = document.getElementById('img_scale_slider');
+  if (el) {
+    el.value = sysStorage.getItem('globalImageScale') || '1.0';
+    document.getElementById('img_scale_val').innerText = el.value + 'x';
+  }
+}
+
+async function saveSettingsContent(e) {
+  e.preventDefault();
+  const btn = document.getElementById('btnSaveSettings');
+  const originalText = btn.innerHTML;
+  btn.innerHTML = 'Saving...';
+  
+  const scale = document.getElementById('img_scale_slider').value;
+  sysStorage.setItem('globalImageScale', scale);
+  
+  // Apply immediately to preview
+  document.documentElement.style.setProperty('--global-img-scale', scale);
+
+  setTimeout(() => {
+    btn.innerHTML = 'Saved Successfully!';
+    setTimeout(() => { btn.innerHTML = originalText; }, 2000);
+  }, 500);
+}
+window.loadSettingsContent = loadSettingsContent;
+window.saveSettingsContent = saveSettingsContent;
 
 // Explicit global window registrations (login/logout/sidebar handled by self-contained modules above)
 window.switchTab = switchTab;
