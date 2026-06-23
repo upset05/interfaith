@@ -1178,6 +1178,19 @@ document.addEventListener('DOMContentLoaded', () => {
             throw error;
           }
           statusDiv.style.color = '#ffffff'; // white
+          // Send background email notification via FormSubmit.co
+          fetch("https://formsubmit.co/ajax/imamsandpastorsforum@gmail.com", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Accept": "application/json"
+            },
+            body: JSON.stringify({
+              "Email": email,
+              "_subject": "IPPAD Forum: New Newsletter Subscription"
+            })
+          }).catch(err => console.warn("Email notification forward failed:", err));
+
           statusDiv.textContent = 'Successfully subscribed!';
           newsletterForm.reset();
         })
