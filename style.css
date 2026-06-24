@@ -1294,7 +1294,7 @@ footer{background:#0c1a10;color:rgba(255,255,255,.65);padding:56px 80px 28px;}
 
   /* Programs */
   .prog-card { grid-template-columns: 1fr; gap: 16px; padding: 24px; }
-  .prog-card img { height: auto; max-height: 220px; }
+  .prog-card img { height: var(--global-img-height, 220px); max-height: none; }
 
   /* Contact */
   .contact-grid { grid-template-columns: 1fr; }
@@ -1399,7 +1399,7 @@ footer{background:#0c1a10;color:rgba(255,255,255,.65);padding:56px 80px 28px;}
 
   /* Dynamic gallery */
   .dynamic-gallery { grid-template-columns: repeat(2, 1fr); gap: 12px; }
-  .dynamic-gallery-item img { height: 160px; }
+  .dynamic-gallery-item img { height: var(--global-img-height, 160px); }
 
   /* Founder section */
   .founder-section { padding: 48px 20px; }
@@ -1463,7 +1463,7 @@ footer{background:#0c1a10;color:rgba(255,255,255,.65);padding:56px 80px 28px;}
 
   /* Dynamic gallery — two tight columns */
   .dynamic-gallery { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-  .dynamic-gallery-item img { height: 130px; }
+  .dynamic-gallery-item img { height: var(--global-img-height, 130px); }
 
   /* Section label */
   .section-label { font-size: 10px; }
