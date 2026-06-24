@@ -1288,6 +1288,14 @@ header {
           </select>
           <p style="font-size: 13px; color: var(--text-light); margin-top: 8px;">Switching to "Show Full Picture" ensures that details like hands, faces, and text are never cut off by the edges of the image cards.</p>
         </div>
+        <div class="input-group">
+          <label for="img_scale_slider">Global Image Zoom Scale (1.0 = Normal, 1.5 = +50% Zoom)</label>
+          <div style="display:flex; align-items:center; gap: 15px;">
+            <input type="range" id="img_scale_slider" min="0.5" max="2.0" step="0.1" value="1.0" style="flex:1;" oninput="document.getElementById('img_scale_val').innerText = this.value + 'x'">
+            <span id="img_scale_val" style="font-weight:bold; min-width: 40px;">1.0x</span>
+          </div>
+          <p style="font-size: 13px; color: var(--text-light); margin-top: 8px;">Increase this value to zoom in on all images (or zoom out if below 1.0).</p>
+        </div>
         <div class="input-group" style="margin-top: 30px;">
           <button type="submit" class="btn-primary" id="btnSaveSettings">Save Settings</button>
         </div>
@@ -2791,9 +2799,15 @@ function showToast(text) {
 
 // --- GLOBAL SETTINGS LOGIC ---
 function loadSettingsContent() {
-  const el = document.getElementById('img_fit_select');
-  if (el) {
-    el.value = sysStorage.getItem('globalImageFit') || 'cover';
+  const fitEl = document.getElementById('img_fit_select');
+  if (fitEl) {
+    fitEl.value = sysStorage.getItem('globalImageFit') || 'cover';
+  }
+  
+  const scaleEl = document.getElementById('img_scale_slider');
+  if (scaleEl) {
+    scaleEl.value = sysStorage.getItem('globalImageScale') || '1.0';
+    document.getElementById('img_scale_val').innerText = scaleEl.value + 'x';
   }
 }
 
@@ -2806,8 +2820,12 @@ async function saveSettingsContent(e) {
   const fitMode = document.getElementById('img_fit_select').value;
   sysStorage.setItem('globalImageFit', fitMode);
   
+  const scale = document.getElementById('img_scale_slider').value;
+  sysStorage.setItem('globalImageScale', scale);
+  
   // Apply immediately to preview
   document.documentElement.style.setProperty('--global-img-fit', fitMode);
+  document.documentElement.style.setProperty('--global-img-scale', scale);
 
   setTimeout(() => {
     btn.innerHTML = 'Saved Successfully!';
