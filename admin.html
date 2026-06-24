@@ -1296,6 +1296,22 @@ header {
           </div>
           <p style="font-size: 13px; color: var(--text-light); margin-top: 8px;">Increase this value to zoom in on all images (or zoom out if below 1.0).</p>
         </div>
+        <div class="input-group">
+          <label for="img_radius_slider">Global Image Corner Roundness (Border Radius)</label>
+          <div style="display:flex; align-items:center; gap: 15px;">
+            <input type="range" id="img_radius_slider" min="0" max="100" step="1" value="8" style="flex:1;" oninput="document.getElementById('img_radius_val').innerText = this.value + 'px'">
+            <span id="img_radius_val" style="font-weight:bold; min-width: 40px;">8px</span>
+          </div>
+          <p style="font-size: 13px; color: var(--text-light); margin-top: 8px;">Adjust how rounded the corners of the images are (e.g. 0px for square, 100px for fully rounded).</p>
+        </div>
+        <div class="input-group">
+          <label for="img_height_slider">Global Image Box Height (Size as a whole)</label>
+          <div style="display:flex; align-items:center; gap: 15px;">
+            <input type="range" id="img_height_slider" min="100" max="600" step="10" value="220" style="flex:1;" oninput="document.getElementById('img_height_val').innerText = this.value + 'px'">
+            <span id="img_height_val" style="font-weight:bold; min-width: 40px;">220px</span>
+          </div>
+          <p style="font-size: 13px; color: var(--text-light); margin-top: 8px;">Adjust the maximum height of the image containers across the site.</p>
+        </div>
         <div class="input-group" style="margin-top: 30px;">
           <button type="submit" class="btn-primary" id="btnSaveSettings">Save Settings</button>
         </div>
@@ -2809,6 +2825,18 @@ function loadSettingsContent() {
     scaleEl.value = sysStorage.getItem('globalImageScale') || '1.0';
     document.getElementById('img_scale_val').innerText = scaleEl.value + 'x';
   }
+
+  const radiusEl = document.getElementById('img_radius_slider');
+  if (radiusEl) {
+    radiusEl.value = sysStorage.getItem('globalImageRadius') || '8';
+    document.getElementById('img_radius_val').innerText = radiusEl.value + 'px';
+  }
+
+  const heightEl = document.getElementById('img_height_slider');
+  if (heightEl) {
+    heightEl.value = sysStorage.getItem('globalImageHeight') || '220';
+    document.getElementById('img_height_val').innerText = heightEl.value + 'px';
+  }
 }
 
 async function saveSettingsContent(e) {
@@ -2822,10 +2850,18 @@ async function saveSettingsContent(e) {
   
   const scale = document.getElementById('img_scale_slider').value;
   sysStorage.setItem('globalImageScale', scale);
+
+  const radius = document.getElementById('img_radius_slider').value;
+  sysStorage.setItem('globalImageRadius', radius);
+
+  const height = document.getElementById('img_height_slider').value;
+  sysStorage.setItem('globalImageHeight', height);
   
   // Apply immediately to preview
   document.documentElement.style.setProperty('--global-img-fit', fitMode);
   document.documentElement.style.setProperty('--global-img-scale', scale);
+  document.documentElement.style.setProperty('--global-img-radius', radius + 'px');
+  document.documentElement.style.setProperty('--global-img-height', height + 'px');
 
   setTimeout(() => {
     btn.innerHTML = 'Saved Successfully!';

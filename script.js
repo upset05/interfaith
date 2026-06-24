@@ -1235,8 +1235,13 @@ window.toggleMenu = toggleMenu;
 (function applyGlobalSettings() {
   const fitMode = sysStorage.getItem('globalImageFit') || 'cover';
   const scale = sysStorage.getItem('globalImageScale') || '1.0';
+  const radius = sysStorage.getItem('globalImageRadius') || '8';
+  const height = sysStorage.getItem('globalImageHeight') || '220';
+  
   document.documentElement.style.setProperty('--global-img-fit', fitMode);
   document.documentElement.style.setProperty('--global-img-scale', scale);
+  document.documentElement.style.setProperty('--global-img-radius', radius + 'px');
+  document.documentElement.style.setProperty('--global-img-height', height + 'px');
 })();
 
 // Night-mode removed: automatic time-based theme has been disabled per request.
