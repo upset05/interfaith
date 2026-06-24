@@ -1696,8 +1696,8 @@ const projectImages = [
 
 // --- CONFIGURATION CONSTANTS ---
 // Paste your Supabase project credentials here to go live globally!
-const SUPABASE_URL = "https://jdgzxvwgvmssayobbdrz.supabase.co"; 
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpkZ3p4dndndm1zc2F5b2JiZHJ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkwMTMxMDgsImV4cCI6MjA5NDU4OTEwOH0.2OydMDLfRXz5dT0lrHwk4SVOPJom4wC86FCXDJ5FLzQ";
+const SUPABASE_URL = "https://ioxcymirkcvhysgwcgub.supabase.co"; 
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlveGN5bWlya2N2aHlzZ3djZ3ViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzMDQ3NTUsImV4cCI6MjA5Nzg4MDc1NX0.Psd45ighFgvxjWtDD11RGCDiiTMJ8AftfyRQmf2Z5_8";
 
 var supabaseLib = window.supabase;
 var supabase = null;
@@ -2846,27 +2846,45 @@ async function saveSettingsContent(e) {
   btn.innerHTML = 'Saving...';
   
   const fitMode = document.getElementById('img_fit_select').value;
-  sysStorage.setItem('globalImageFit', fitMode);
-  
-  const scale = document.getElementById('img_scale_slider').value;
-  sysStorage.setItem('globalImageScale', scale);
+  const scale   = document.getElementById('img_scale_slider').value;
+  const radius  = document.getElementById('img_radius_slider').value;
+  const height  = document.getElementById('img_height_slider').value;
 
-  const radius = document.getElementById('img_radius_slider').value;
+  // Save locally as cache/fallback
+  sysStorage.setItem('globalImageFit',    fitMode);
+  sysStorage.setItem('globalImageScale',  scale);
   sysStorage.setItem('globalImageRadius', radius);
-
-  const height = document.getElementById('img_height_slider').value;
   sysStorage.setItem('globalImageHeight', height);
   
-  // Apply immediately to preview
-  document.documentElement.style.setProperty('--global-img-fit', fitMode);
-  document.documentElement.style.setProperty('--global-img-scale', scale);
+  // Apply immediately on this page
+  document.documentElement.style.setProperty('--global-img-fit',    fitMode);
+  document.documentElement.style.setProperty('--global-img-scale',  scale);
   document.documentElement.style.setProperty('--global-img-radius', radius + 'px');
   document.documentElement.style.setProperty('--global-img-height', height + 'px');
 
-  setTimeout(() => {
-    btn.innerHTML = 'Saved Successfully!';
-    setTimeout(() => { btn.innerHTML = originalText; }, 2000);
-  }, 500);
+  // Save to Supabase so ALL devices (including mobile) pick up the change
+  try {
+    if (supabaseClient) {
+      const rows = [
+        { key: 'globalImageFit',    value: fitMode },
+        { key: 'globalImageScale',  value: scale },
+        { key: 'globalImageRadius', value: radius },
+        { key: 'globalImageHeight', value: height }
+      ];
+      const { error } = await supabaseClient
+        .from('site_settings')
+        .upsert(rows, { onConflict: 'key' });
+      if (error) throw error;
+      btn.innerHTML = 'Saved — Live on All Devices!';
+    } else {
+      btn.innerHTML = 'Saved Locally (offline)';
+    }
+  } catch (err) {
+    console.error('Settings save error:', err);
+    btn.innerHTML = 'Saved Locally (sync failed)';
+  }
+
+  setTimeout(() => { btn.innerHTML = originalText; }, 2500);
 }
 window.loadSettingsContent = loadSettingsContent;
 window.saveSettingsContent = saveSettingsContent;

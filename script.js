@@ -28,8 +28,8 @@ const sysStorage = {
 
 // --- CONFIGURATION CONSTANTS ---
 // Paste your Supabase project credentials here to go live globally!
-const SUPABASE_URL = "https://jdgzxvwgvmssayobbdrz.supabase.co"; 
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpkZ3p4dndndm1zc2F5b2JiZHJ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkwMTMxMDgsImV4cCI6MjA5NDU4OTEwOH0.2OydMDLfRXz5dT0lrHwk4SVOPJom4wC86FCXDJ5FLzQ";
+const SUPABASE_URL = "https://ioxcymirkcvhysgwcgub.supabase.co"; 
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlveGN5bWlya2N2aHlzZ3djZ3ViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzMDQ3NTUsImV4cCI6MjA5Nzg4MDc1NX0.Psd45ighFgvxjWtDD11RGCDiiTMJ8AftfyRQmf2Z5_8";
 
 let supabaseClient = null;
 
@@ -1231,18 +1231,51 @@ document.addEventListener('DOMContentLoaded', () => {
 // Keep as global fallback in case any page still has onclick="toggleMenu()"
 window.toggleMenu = toggleMenu;
 
-// --- GLOBAL DISPLAY SETTINGS ---
-(function applyGlobalSettings() {
-  const fitMode = sysStorage.getItem('globalImageFit') || 'cover';
-  const scale = sysStorage.getItem('globalImageScale') || '1.0';
-  const radius = sysStorage.getItem('globalImageRadius') || '8';
-  const height = sysStorage.getItem('globalImageHeight') || '220';
-  
-  document.documentElement.style.setProperty('--global-img-fit', fitMode);
-  document.documentElement.style.setProperty('--global-img-scale', scale);
+// --- GLOBAL DISPLAY SETTINGS (Supabase-backed, applies to ALL devices) ---
+function applyImageSettings(settings) {
+  const fitMode = settings.globalImageFit || 'cover';
+  const scale   = settings.globalImageScale || '1.0';
+  const radius  = settings.globalImageRadius || '8';
+  const height  = settings.globalImageHeight || '220';
+
+  document.documentElement.style.setProperty('--global-img-fit',    fitMode);
+  document.documentElement.style.setProperty('--global-img-scale',  scale);
   document.documentElement.style.setProperty('--global-img-radius', radius + 'px');
   document.documentElement.style.setProperty('--global-img-height', height + 'px');
+}
+
+// Apply defaults immediately so the page doesn't flash unstyled
+applyImageSettings({
+  globalImageFit:    sysStorage.getItem('globalImageFit')    || 'cover',
+  globalImageScale:  sysStorage.getItem('globalImageScale')  || '1.0',
+  globalImageRadius: sysStorage.getItem('globalImageRadius') || '8',
+  globalImageHeight: sysStorage.getItem('globalImageHeight') || '220'
+});
+
+// Then fetch live values from Supabase and re-apply (overrides local cache)
+(function fetchGlobalSettings() {
+  const tryFetch = () => {
+    if (!window.supabase || typeof window.supabase.createClient !== 'function') {
+      setTimeout(tryFetch, 100);
+      return;
+    }
+    const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    client
+      .from('site_settings')
+      .select('key, value')
+      .then(({ data, error }) => {
+        if (error || !data) return;
+        const settings = {};
+        data.forEach(row => { settings[row.key] = row.value; });
+        // Cache locally for offline fallback
+        Object.keys(settings).forEach(k => sysStorage.setItem(k, settings[k]));
+        applyImageSettings(settings);
+      });
+  };
+  tryFetch();
 })();
+
+window.applyImageSettings = applyImageSettings;
 
 // Night-mode removed: automatic time-based theme has been disabled per request.
 
