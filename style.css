@@ -1352,7 +1352,7 @@ footer{background:#0c1a10;color:rgba(255,255,255,.65);padding:56px 80px 28px;}
 
   /* About */
   .about-grid { gap: 28px; }
-  .about-grid > .about-image img { max-width: 100% !important; max-height: 260px !important; }
+  .about-grid > .about-image img { max-width: 100% !important; max-height: var(--global-img-height, 260px) !important; }
 
   /* Contact */
   .cinfo-card { padding: 18px; }
@@ -1443,7 +1443,7 @@ footer{background:#0c1a10;color:rgba(255,255,255,.65);padding:56px 80px 28px;}
   .obj-item { padding: 16px 14px; }
 
   /* About image */
-  .about-grid > .about-image img { max-height: 220px !important; }
+  .about-grid > .about-image img { max-height: var(--global-img-height, 220px) !important; }
 
   /* Contact form */
   .form-group input,
