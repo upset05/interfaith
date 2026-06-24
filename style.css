@@ -1569,6 +1569,8 @@ footer{background:#0c1a10;color:rgba(255,255,255,.65);padding:56px 80px 28px;}
 }
 
 
-/* GLOBAL IMAGE SCALE FROM ADMIN */
-img { transform: scale(var(--global-img-scale, 1.0)); transition: transform 0.3s ease; }
+/* GLOBAL IMAGE SETTINGS FROM ADMIN */
+img {
+  object-fit: var(--global-img-fit, cover) !important;
+}
 

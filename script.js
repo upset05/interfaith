@@ -1233,8 +1233,8 @@ window.toggleMenu = toggleMenu;
 
 // --- GLOBAL DISPLAY SETTINGS ---
 (function applyGlobalSettings() {
-  const scale = sysStorage.getItem('globalImageScale') || '1.0';
-  document.documentElement.style.setProperty('--global-img-scale', scale);
+  const fitMode = sysStorage.getItem('globalImageFit') || 'cover';
+  document.documentElement.style.setProperty('--global-img-fit', fitMode);
 })();
 
 // Night-mode removed: automatic time-based theme has been disabled per request.

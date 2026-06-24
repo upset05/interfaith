@@ -1281,12 +1281,12 @@ header {
       </div>
       <form id="settingsForm" onsubmit="try { saveSettingsContent(event); } catch(e) { console.error(e); } return false;">
         <div class="input-group">
-          <label for="img_scale_slider">Global Image Zoom Scale (1.0 = Normal, 1.5 = +50% Zoom)</label>
-          <div style="display:flex; align-items:center; gap: 15px;">
-            <input type="range" id="img_scale_slider" min="0.5" max="2.0" step="0.1" value="1.0" style="flex:1;" oninput="document.getElementById('img_scale_val').innerText = this.value + 'x'">
-            <span id="img_scale_val" style="font-weight:bold; min-width: 40px;">1.0x</span>
-          </div>
-          <p style="font-size: 13px; color: var(--text-light); margin-top: 8px;">Increase this value to zoom in on all images, revealing more detail without breaking the layout.</p>
+          <label for="img_fit_select">Global Image Display Mode</label>
+          <select id="img_fit_select" style="width: 100%; padding: 12px; border-radius: 6px; border: 1px solid var(--border);">
+            <option value="cover">Fill Box (May crop edges to fit uniformly)</option>
+            <option value="contain">Show Full Picture (No cropping, preserves all details)</option>
+          </select>
+          <p style="font-size: 13px; color: var(--text-light); margin-top: 8px;">Switching to "Show Full Picture" ensures that details like hands, faces, and text are never cut off by the edges of the image cards.</p>
         </div>
         <div class="input-group" style="margin-top: 30px;">
           <button type="submit" class="btn-primary" id="btnSaveSettings">Save Settings</button>
@@ -2791,10 +2791,9 @@ function showToast(text) {
 
 // --- GLOBAL SETTINGS LOGIC ---
 function loadSettingsContent() {
-  const el = document.getElementById('img_scale_slider');
+  const el = document.getElementById('img_fit_select');
   if (el) {
-    el.value = sysStorage.getItem('globalImageScale') || '1.0';
-    document.getElementById('img_scale_val').innerText = el.value + 'x';
+    el.value = sysStorage.getItem('globalImageFit') || 'cover';
   }
 }
 
@@ -2804,11 +2803,11 @@ async function saveSettingsContent(e) {
   const originalText = btn.innerHTML;
   btn.innerHTML = 'Saving...';
   
-  const scale = document.getElementById('img_scale_slider').value;
-  sysStorage.setItem('globalImageScale', scale);
+  const fitMode = document.getElementById('img_fit_select').value;
+  sysStorage.setItem('globalImageFit', fitMode);
   
   // Apply immediately to preview
-  document.documentElement.style.setProperty('--global-img-scale', scale);
+  document.documentElement.style.setProperty('--global-img-fit', fitMode);
 
   setTimeout(() => {
     btn.innerHTML = 'Saved Successfully!';
