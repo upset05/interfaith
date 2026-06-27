@@ -114,7 +114,7 @@ function resolveMediaSrc(element, src, property = 'src') {
   }
 
   // Directly assign local relative files for WhatsApp images and logo
-  if (src.startsWith('WhatsApp Image') || src === 'logo.jpeg' || src === 'founder.jpeg') {
+  if (src.startsWith('WhatsApp Image') || src === 'interfaith logo.png' || src === 'founder.jpeg') {
     const encodedSrc = encodeURI(src);
     if (element) {
       element[property] = encodedSrc;
@@ -122,7 +122,7 @@ function resolveMediaSrc(element, src, property = 'src') {
       if (element.tagName === 'IMG') {
         element.onerror = () => {
           console.warn(`Failed to load image: ${src}`);
-          element.src = 'logo.jpeg'; // Fallback to logo if image fails
+          element.src = 'interfaith logo.png'; // Fallback to logo if image fails
         };
       }
     }
@@ -240,7 +240,7 @@ window.addEventListener('load', function() {
 // All Gallery Images (Use Supabase URLs first, then local filenames as fallback)
 const defaultGalleryImages = [
   "https://ioxcymirkcvhysgwcgub.supabase.co/storage/v1/object/public/images/founder.jpeg",
-  "https://ioxcymirkcvhysgwcgub.supabase.co/storage/v1/object/public/images/logo.jpeg",
+  "https://ioxcymirkcvhysgwcgub.supabase.co/storage/v1/object/public/images/interfaith logo.png",
   "https://ioxcymirkcvhysgwcgub.supabase.co/storage/v1/object/public/images/WhatsApp_Image_2026-05-01_at_5.53.05_PM_1.jpeg",
   "https://ioxcymirkcvhysgwcgub.supabase.co/storage/v1/object/public/images/WhatsApp_Image_2026-05-01_at_5.53.05_PM.jpeg",
   "https://ioxcymirkcvhysgwcgub.supabase.co/storage/v1/object/public/images/WhatsApp_Image_2026-05-04_at_1.56.34_PM.jpeg",
@@ -662,7 +662,7 @@ function renderPostsUI() {
         card.className = 'card reveal';
         
         const img = document.createElement('img');
-        img.src = 'logo.jpeg';
+        img.src = 'interfaith logo.png';
         img.alt = post.title;
         img.style.width = '100%';
         img.style.height = '200px';
@@ -718,7 +718,7 @@ function renderEventsUI() {
         card.className = 'card reveal';
         
         const img = document.createElement('img');
-        img.src = 'logo.jpeg';
+        img.src = 'interfaith logo.png';
         img.alt = eh.title;
         img.style.width = '100%';
         img.style.height = '220px';
